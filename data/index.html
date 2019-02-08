@@ -1,10 +1,14 @@
+<!DOCTYPE html>
 <html>
 
 <head>
   <title>ESP8266 Tracer Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
   <link rel="stylesheet" href="styles.css">
   <script>
     function updateData() {
+      //document.getElementById("reloadCB").checked=true;
       console.log("updateData()");
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function () {
@@ -46,7 +50,7 @@
   <h1>ESP8266 Tracer Dashboard</h1>
   <table class='data-table'>
     <tr>
-      <th width="200px">Item</th>
+      <th width="200px">Realtime Stats</th>
       <th width="100px">Value</th>
     </tr>
     <tr>

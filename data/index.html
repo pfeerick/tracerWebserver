@@ -11,17 +11,17 @@
         if (this.readyState == 4 && this.status == 200) {
           console.log("updateData(): got Data:", this.responseText);
           var data = JSON.parse(this.responseText);
-          document.getElementById("pv_power").innerHTML = data.pv_power + " W";
-          document.getElementById("pv_current").innerHTML = data.pv_current + " A";
-          document.getElementById("pv_voltage").innerHTML = data.pv_voltage + " V";
-          document.getElementById("load_current").innerHTML = data.load_current + " A";
-          document.getElementById("load_power").innerHTML = data.load_power + " W";
-          document.getElementById("batt_temp").innerHTML = data.batt_temp + " &deg;C";
-          document.getElementById("batt_voltage").innerHTML = data.batt_voltage + " V";
-          document.getElementById("batt_current").innerHTML = data.batt_current + " A";
-          document.getElementById("batt_remain").innerHTML = data.batt_remain + " %";
-          document.getElementById("batt_charge_power").innerHTML = data.batt_charge_power + " W";
-          document.getElementById("case_temp").innerHTML = data.case_temp + " &deg;C";
+          document.getElementById("pv_power").innerHTML = data.pv_power.toFixed(0) + " W";
+          document.getElementById("pv_current").innerHTML = data.pv_current.toFixed(2) + " A";
+          document.getElementById("pv_voltage").innerHTML = data.pv_voltage.toFixed(2) + " V";
+          document.getElementById("load_current").innerHTML = data.load_current.toFixed(2) + " A";
+          document.getElementById("load_power").innerHTML = data.load_power.toFixed(0) + " W";
+          document.getElementById("batt_temp").innerHTML = data.batt_temp.toFixed(2) + " &deg;C";
+          document.getElementById("batt_voltage").innerHTML = data.batt_voltage.toFixed(2) + " V";
+          document.getElementById("batt_current").innerHTML = data.batt_current.toFixed(2) + " A";
+          document.getElementById("batt_remain").innerHTML = data.batt_remain.toFixed(2) + " %";
+          document.getElementById("batt_charge_power").innerHTML = data.batt_charge_power.toFixed(0) + " W";
+          document.getElementById("case_temp").innerHTML = data.case_temp.toFixed(2) + " &deg;C";
         }
       };
       xhttp.open("GET", "/getData", true);

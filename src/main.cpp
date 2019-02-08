@@ -9,12 +9,15 @@
 
 #include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
 #include <DNSServer.h>
+#include <ESP8266mDNS.h>
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>         //https://github.com/tzapu/WiFiManager
 
 #include <ArduinoOTA.h>
 
-#define OTA_HOSTNAME "tracer"
+#include <FS.h>   // Include the SPIFFS library
+
+#define HOSTNAME "tracer"
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 float battChargeCurrent, battDischargeCurrent, battOverallCurrent, battChargePower;
@@ -29,6 +32,8 @@ ModbusMaster node;
 Timer timer;
 
 // tracer requires no handshaking
+void getData();
+
 void preTransmission() {}
 void postTransmission() {}
 
@@ -59,12 +64,14 @@ RegistryList Registries = {
 // keep log of where we are
 uint8_t currentRegistryNumber = 0;
 
-WiFiServer server(80);
-
+//WiFiServer server(80);
+ESP8266WebServer server(80); 
 // Variable to store the HTTP request
 String header;
 
 void checkLoad();
+String getContentType(String filename); // convert the file extension to the MIME type
+bool handleFileRead(String path);       // send the right file to the client (if it exists)
 
 void setup() {
   DebugBegin(115200);
@@ -93,7 +100,13 @@ void setup() {
 
  DebugPrintln("Starting ArduinoOTA...");
 
- ArduinoOTA.setHostname(OTA_HOSTNAME);
+  if (MDNS.begin(HOSTNAME)) {              // Start the mDNS responder for esp8266.local
+    Serial.println("mDNS responder started");
+  } else {
+    Serial.println("Error setting up MDNS responder!");
+  }
+
+ ArduinoOTA.setHostname(HOSTNAME);
 
   ArduinoOTA.onStart([]() {
     String type;
@@ -101,9 +114,9 @@ void setup() {
       type = "sketch";
     } else { // U_SPIFFS
       type = "filesystem";
+        SPIFFS.end();
     }
 
-    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
     DebugPrintln("Start updating " + type);
   });
   
@@ -139,7 +152,20 @@ void setup() {
 
   DebugPrint("IP address: ");
   DebugPrintln(WiFi.localIP());
+
+  SPIFFS.begin();                           // Start the SPI Flash Files System
   
+  server.onNotFound([]() {                              // If the client requests any URI
+    if (!handleFileRead(server.uri()))                  // send it if it exists
+      server.send(404, "text/plain", "404: Not Found"); // otherwise, respond with a 404 (Not Found) error
+  });
+
+  server.serveStatic("/", SPIFFS, "/index.html");
+  server.on ( "/getData", getData );
+
+  server.begin();                           // Actually start the server
+  DebugPrintln("HTTP server started");
+
   DebugPrintln("Starting timed actions...");
   timer.every(1000L, executeCurrentRegistryFunction);
   timer.every(1000L, nextRegistryNumber);
@@ -148,81 +174,52 @@ void setup() {
   DebugPrintln("Setup OK!");
   DebugPrintln("----------------------------");
   DebugPrintln();
-
-  server.begin();
 }
 
-void loop() {
-   ArduinoOTA.handle();
-   timer.update();
+void loop() 
+{
+  MDNS.update();
+  ArduinoOTA.handle();
+  timer.update();
+  
+  server.handleClient();
+}
 
-   WiFiClient client = server.available();   // Listen for incoming clients
+void getData() {
+    server.send ( 200, "application/json", 
+     "{\"pv_power\":" + String(pvpower) +
+    ", \"pv_current\":" + String(pvcurrent) +
+    ", \"pv_voltage\":" + String(pvvoltage) +
+    ", \"load_current\":" + String(lcurrent) +
+    ", \"load_power\":" + String(lpower) +
+    ", \"batt_temp\":" + String(btemp) +
+    ", \"batt_voltage\":" + String(bvoltage) +
+    ", \"batt_current\":" + String(battOverallCurrent) +
+    ", \"batt_remain\":" + String(bremaining) +
+    ", \"batt_charge_power\":" + String(battChargePower) +
+    ", \"case_temp\":" + String(ctemp) + "}" );
+}
 
-  if (client) {                             // If a new client connects,
-    String currentLine = "";                // make a String to hold incoming data from the client
-    while (client.connected()) {            // loop while the client's connected
-      if (client.available()) {             // if there's bytes to read from the client,
-        char c = client.read();             // read a byte, then
-        header += c;
-        if (c == '\n') {                    // if the byte is a newline character
-          // if the current line is blank, you got two newline characters in a row.
-          // that's the end of the client HTTP request, so send a response:
-          if (currentLine.length() == 0) {
-            // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
-            // and a content-type so the client knows what's coming, then a blank line:
-            client.println("HTTP/1.1 200 OK");
-            client.println("Content-type:text/html");
-            client.println("Connection: close");
-            client.println();
-                       
-            // Display the HTML web page
-            client.println("<!DOCTYPE html><html>");
-            client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-            client.println("<meta http-equiv=\"refresh\" content=\"5\"");
-            client.println("<link rel=\"icon\" href=\"data:,\">");
-            client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto;} .data-table td {   width: 200px; }</style>");
-            
-            // Web Page Heading
-            client.println("<body><h1>ESP8266 Tracer Dashboard</h1>");
-            client.println("<table class='data-table'>");
-            
-            client.println("<tr><td>PV Power</td><td>" + String(pvpower) + "W</td></tr>");
-            client.println("<tr><td>PV Current</td><td>" + String(pvcurrent) + "A</td></tr>");
-            client.println("<tr><td>PV Voltage</td><td>" + String(pvvoltage) + "V</td></tr>");
-            
-            client.println("<tr><td>Load Current</td><td>" + String(lcurrent) + "A</td></tr>");
-            client.println("<tr><td>Load Power</td><td>" + String(lpower) + "W</td></tr>");
-            
-            client.println("<tr><td>Battery Temp</td><td>" + String(btemp) + "&deg;C</td></tr>");
-            client.println("<tr><td>Battery Voltage</td><td>" + String(bvoltage) + "V</td></tr>");
-            client.println("<tr><td>Battery Current</td><td>" + String(battOverallCurrent) + "A</td></tr>");
-            client.println("<tr><td>Battery Remaining</td><td>" + String(bremaining) + "%</td></tr>");
-            
-            client.println("<tr><td>Battery Charge Power</td><td>" + String(battChargePower) + "W</td></tr>");            
-            
-            client.println("<tr><td>Case Temp</td><td>" + String(ctemp) + "&deg;C</td></tr>");
-            
-            client.println("</table>");
+String getContentType(String filename) { // convert the file extension to the MIME type
+  if (filename.endsWith(".html")) return "text/html";
+  else if (filename.endsWith(".css")) return "text/css";
+  else if (filename.endsWith(".js")) return "application/javascript";
+  else if (filename.endsWith(".ico")) return "image/x-icon";
+  return "text/plain";
+}
 
-            client.println("</body></html>");
-            
-            // The HTTP response ends with another blank line
-            client.println();
-            // Break out of the while loop
-            break;
-          } else { // if you got a newline, then clear currentLine
-            currentLine = "";
-          }
-        } else if (c != '\r') {  // if you got anything else but a carriage return character,
-          currentLine += c;      // add it to the end of the currentLine
-        }
-      }
-    }
-    // Clear the header variable
-    header = "";
-    // Close the connection
-    client.stop();
+bool handleFileRead(String path) { // send the right file to the client (if it exists)
+ DebugPrintln("handleFileRead: " + path);
+  if (path.endsWith("/")) path += "index.html";         // If a folder is requested, send the index file
+  String contentType = getContentType(path);            // Get the MIME type
+  if (SPIFFS.exists(path)) {                            // If the file exists
+    File file = SPIFFS.open(path, "r");                 // Open it
+    size_t sent = server.streamFile(file, contentType); // And send it to the client
+    file.close();                                       // Then close the file again
+    return true;
   }
+  DebugPrintln("\tFile Not Found");
+  return false;                                         // If the file doesn't exist, return false
 }
 
 void checkLoad()

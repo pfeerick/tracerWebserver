@@ -1,0 +1,96 @@
+<html>
+
+<head>
+  <title>ESP8266 Tracer Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    function updateData() {
+      console.log("updateData()");
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          console.log("updateData(): got Data:", this.responseText);
+          var data = JSON.parse(this.responseText);
+          document.getElementById("pv_power").innerHTML = data.pv_power + " W";
+          document.getElementById("pv_current").innerHTML = data.pv_current + " A";
+          document.getElementById("pv_voltage").innerHTML = data.pv_voltage + " V";
+          document.getElementById("load_current").innerHTML = data.load_current + " A";
+          document.getElementById("load_power").innerHTML = data.load_power + " W";
+          document.getElementById("batt_temp").innerHTML = data.batt_temp + " &deg;C";
+          document.getElementById("batt_voltage").innerHTML = data.batt_voltage + " V";
+          document.getElementById("batt_current").innerHTML = data.batt_current + " A";
+          document.getElementById("batt_remain").innerHTML = data.batt_remain + " %";
+          document.getElementById("batt_charge_power").innerHTML = data.batt_charge_power + " W";
+          document.getElementById("case_temp").innerHTML = data.case_temp + " &deg;C";
+        }
+      };
+      xhttp.open("GET", "/getData", true);
+      xhttp.send();
+    }
+
+    updateData();
+    window.setInterval(updateData, 5000); //update the sensordata 5 seconds
+  </script>
+</head>
+
+<body>
+  <h1>ESP8266 Tracer Dashboard</h1>
+  <table class='data-table'>
+    <tr>
+      <th width="200px">Item</th>
+      <th width="100px">Value</th>
+    </tr>
+    <tr>
+      <td>PV Power</td>
+      <td id="pv_power"></td>
+    </tr>
+    <tr>
+      <td>PV Current</td>
+      <td id="pv_current"></td>
+    </tr>
+    <tr>
+      <td>PV Voltage</td>
+      <td id="pv_voltage"></td>
+    </tr>
+
+    <tr>
+      <td>Load Current</td>
+      <td id="load_current"></td>
+    </tr>
+    <tr>
+      <td>Load Power</td>
+      <td id="load_power"></td>
+    </tr>
+
+    <tr>
+      <td>Battery Temp</td>
+      <td id="batt_temp"></td>
+    </tr>
+    <tr>
+      <td>Battery Voltage</td>
+      <td id="batt_voltage"></td>
+    </tr>
+    <tr>
+      <td>Battery Current</td>
+      <td id="batt_current"></td>
+    </tr>
+    <tr>
+      <td>Battery Remaining</td>
+      <td id="batt_remain"></td>
+    </tr>
+
+    <tr>
+      <td>Battery Charge Power</td>
+      <td id="batt_charge_power"></td>
+    </tr>
+
+    <tr>
+      <td>Case Temp</td>
+      <td id="case_temp"></td>
+    </tr>
+
+  </table>
+
+</body>
+
+</html>

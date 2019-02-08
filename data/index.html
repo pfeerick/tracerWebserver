@@ -28,8 +28,17 @@
       xhttp.send();
     }
 
+    function toggleAutoRefresh(cb) {
+      if (cb.checked) {
+        refreshData = window.setInterval(updateData, 5000);
+      } else {
+        clearTimeout(refreshData);
+      }
+    }
+
     updateData();
-    window.setInterval(updateData, 5000); //update the sensordata 5 seconds
+
+    refreshData = window.setInterval(updateData, 5000); //update the sensordata 5 seconds
   </script>
 </head>
 
@@ -90,6 +99,8 @@
     </tr>
 
   </table>
+
+  <input type="checkbox" onclick="toggleAutoRefresh(this);" id="reloadCB" checked> Auto Refresh
 
 </body>
 

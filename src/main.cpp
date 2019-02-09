@@ -14,7 +14,8 @@
 #include <ArduinoOTA.h>
 #include <FS.h> // Include the SPIFFS library
 
-#define HOSTNAME "tracer"
+//#define HOSTNAME "tracer-1"
+#define LED_PIN D4 //GPIO2
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 float battChargeCurrent, battDischargeCurrent, battOverallCurrent, battChargePower;
@@ -221,15 +222,15 @@ void setup()
   Serial.println("");
 #endif
 
-  pinMode(LED_BUILTIN, OUTPUT);    //GPIO16
-  digitalWrite(LED_BUILTIN, HIGH); //inverted, off
+  pinMode(LED_PIN, OUTPUT); 
+  digitalWrite(LED_PIN, HIGH); //inverted, off
 
   node.begin(1, Serial);
   node.preTransmission(preTransmission);
   node.postTransmission(postTransmission);
 
   WiFiManager wifiManager;
-  //wifiManager.resetSettings();
+  // wifiManager.resetSettings();
   wifiManager.autoConnect("AutoConnectAP");
 
   DebugPrintln("Starting ArduinoOTA...");
@@ -262,13 +263,13 @@ void setup()
 
   ArduinoOTA.onEnd([]() {
     DebugPrintln("\nEnd of update");
-    digitalWrite(LED_BUILTIN, HIGH);
+    digitalWrite(LED_PIN, HIGH);
   });
 
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
     int percentageComplete = (progress / (total / 100));
     DebugPrintf("Progress: %u%%\r", percentageComplete);
-    digitalWrite(LED_BUILTIN, percentageComplete % 2);
+    digitalWrite(LED_PIN, percentageComplete % 2);
   });
 
   ArduinoOTA.onError([](ota_error_t error) {
@@ -323,6 +324,8 @@ void setup()
   DebugPrintln("Setup OK!");
   DebugPrintln("----------------------------");
   DebugPrintln();
+
+  WiFi.setSleepMode(WIFI_MODEM_SLEEP);
 }
 
 void loop()
@@ -332,6 +335,7 @@ void loop()
   timer.update();
 
   server.handleClient();
+  delay(100);
 }
 
 void getData()

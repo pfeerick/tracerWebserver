@@ -4,17 +4,14 @@
 #define DEBUG_OI Serial
 #include "debug.h"
 
-#include <ModbusMaster.h>
-#include <Timer.h>
-
-#include <ESP8266WiFi.h> //https://github.com/esp8266/Arduino
+#include <ModbusMaster.h> //https://github.com/4-20ma/ModbusMaster
+#include <Timer.h>        //https://github.com/JChristensen/Timer
+#include <ESP8266WiFi.h>  //https://github.com/esp8266/Arduino
 #include <DNSServer.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h> //https://github.com/tzapu/WiFiManager
-
 #include <ArduinoOTA.h>
-
 #include <FS.h> // Include the SPIFFS library
 
 #define HOSTNAME "tracer"
@@ -25,7 +22,18 @@ float bvoltage, ctemp, btemp, bremaining, lpower, lcurrent, pvvoltage, pvcurrent
 float stats_today_pv_volt_min, stats_today_pv_volt_max;
 uint8_t result;
 
+// response = client.read_device_info()
+// print "Manufacturer:", repr(response.information[0])
+// print "Model:", repr(response.information[1])
 // print "Version:", repr(response.information[2])
+
+// 43 / 14 (0x2B / 0x0E) Read Device Identification
+// Object Id | Object Name / Description  | Type         | M/O       | category 
+// 0x00      | VendorName                 | ASCII String | Mandatory |  
+// 0x01      | ProductCode                | ASCII String | Mandatory | 
+// 0x02      | MajorMinorRevision         | ASCII String | Mandatory | Basic  
+
+
 //rated data
 struct rated_data
 {

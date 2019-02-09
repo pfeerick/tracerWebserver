@@ -25,6 +25,7 @@ float bvoltage, ctemp, btemp, bremaining, lpower, lcurrent, pvvoltage, pvcurrent
 float stats_today_pv_volt_min, stats_today_pv_volt_max;
 uint8_t result;
 
+// print "Version:", repr(response.information[2])
 bool rs485DataReceived = true;
 bool loadPoweredOn = true;
 

@@ -26,10 +26,10 @@ uint8_t result;
 // print "Version:", repr(response.information[2])
 
 // 43 / 14 (0x2B / 0x0E) Read Device Identification
-// Object Id | Object Name / Description  | Type         | M/O       | category 
-// 0x00      | VendorName                 | ASCII String | Mandatory |  
-// 0x01      | ProductCode                | ASCII String | Mandatory | 
-// 0x02      | MajorMinorRevision         | ASCII String | Mandatory | Basic  
+// Object Id | Object Name / Description  | Type         | M/O       | category
+// 0x00      | VendorName                 | ASCII String | Mandatory |
+// 0x01      | ProductCode                | ASCII String | Mandatory |
+// 0x02      | MajorMinorRevision         | ASCII String | Mandatory | Basic
 
 struct device_id
 {
@@ -171,6 +171,7 @@ Timer timer;
 //web server json responders
 void getRatedData();
 void getRealtimeData();
+void getStatisticalData();
 
 // tracer requires no handshaking
 void preTransmission() {}
@@ -227,7 +228,7 @@ void setup()
   Serial.println("");
 #endif
 
-  pinMode(LED_PIN, OUTPUT); 
+  pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH); //inverted, off
 
   node.begin(1, Serial);
@@ -318,6 +319,7 @@ void setup()
   server.serveStatic("/", SPIFFS, "/index.html");
   server.on("/getRatedData", getRatedData);
   server.on("/getRealtimeData", getRealtimeData);
+  server.on("/getStatisticalData", getStatisticalData);
 
   server.begin(); // Actually start the server
   DebugPrintln("HTTP server started");
@@ -376,19 +378,26 @@ void getRealtimeData()
                   ", \"batteryRemoteTemp\":" + String(realtimeStatus.batteryRemoteTemp) +
                   ", \"batteryRatedPower\":" + String(realtimeStatus.batteryRatedPower) + "}");
 }
+
+void getStatisticalData()
 {
   server.send(200, "application/json",
-              "{\"pv_power\":" + String(realtimeStatus.pvPower) +
-                  ", \"pv_current\":" + String(realtimeStatus.pvCurrent) +
-                  ", \"pv_voltage\":" + String(realtimeStatus.pvVoltage) +
-                  ", \"load_current\":" + String(realtimeStatus.loadCurrent) +
-                  ", \"load_power\":" + String(realtimeStatus.loadPower) +
-                  ", \"batt_temp\":" + String(realtimeStatus.batteryTemp) +
-                  ", \"batt_voltage\":" + String(realtimeStatus.batteryVoltage) +
-                  ", \"batt_current\":" + String(statisticalParameters.batteryCurrent) +
-                  ", \"batt_remain\":" + String(realtimeStatus.batterySoc) +
-                  ", \"batt_charge_power\":" + String(realtimeStatus.batteryChargingPower) +
-                  ", \"case_temp\":" + String(realtimeStatus.equipTemp) + "}");
+              "{\"todayMaxPvVoltage\":" + String(statisticalParameters.todayMaxPvVoltage) +
+                  ", \"todayMinPvVoltage\":" + String(statisticalParameters.todayMinPvVoltage) +
+                  ", \"todayMaxBattVoltage\":" + String(statisticalParameters.todayMaxBattVoltage) +
+                  ", \"todayMinBattVoltage\":" + String(statisticalParameters.todayMinBattVoltage) +
+                  ", \"todayConsumedEnergy\":" + String(statisticalParameters.todayConsumedEnergy) +
+                  ", \"monthConsumedEnergy\":" + String(statisticalParameters.monthConsumedEnergy) +
+                  ", \"yearConsumedEnergy\":" + String(statisticalParameters.yearConsumedEnergy) +
+                  ", \"totalConsumedEnergy\":" + String(statisticalParameters.totalConsumedEnergy) +
+                  ", \"todayGeneratedEnergy\":" + String(statisticalParameters.todayGeneratedEnergy) +
+                  ", \"monthGeneratedEnergy\":" + String(statisticalParameters.monthGeneratedEnergy) +
+                  ", \"yearGeneratedEnergy\":" + String(statisticalParameters.yearGeneratedEnergy) +
+                  ", \"totalGeneratedEnergy\":" + String(statisticalParameters.totalGeneratedEnergy) +
+                  ", \"CO2reduction\":" + String(statisticalParameters.CO2reduction) +
+                  ", \"batteryCurrent\":" + String(statisticalParameters.batteryCurrent) +
+                  ", \"batteryTemp\":" + String(statisticalParameters.batteryTemp) +
+                  ", \"ambientTemp\":" + String(statisticalParameters.ambientTemp) + "}");
 }
 
 String getContentType(String filename)

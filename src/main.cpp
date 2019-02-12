@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#define DEBUG
+//#define DEBUG
 #define DEBUG_OI Serial
 #include "debug.h"
 
@@ -19,17 +19,6 @@
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 uint8_t result;
-
-// response = client.read_device_info()
-// print "Manufacturer:", repr(response.information[0])
-// print "Model:", repr(response.information[1])
-// print "Version:", repr(response.information[2])
-
-// 43 / 14 (0x2B / 0x0E) Read Device Identification
-// Object Id | Object Name / Description  | Type         | M/O       | category
-// 0x00      | VendorName                 | ASCII String | Mandatory |
-// 0x01      | ProductCode                | ASCII String | Mandatory |
-// 0x02      | MajorMinorRevision         | ASCII String | Mandatory | Basic
 
 struct device_id
 {
@@ -192,11 +181,11 @@ void executeCurrentRegistryFunction();
 void nextRegistryNumber();
 
 void AddressRegistry_3100();
-// void AddressRegistry_3106();
-void AddressRegistry_3110();
 void AddressRegistry_310C();
+void AddressRegistry_3110();
 void AddressRegistry_311A();
 void AddressRegistry_311D();
+
 void AddressRegistry_331B();
 
 // a list of the regisities to query in order
@@ -214,6 +203,7 @@ uint8_t currentRegistryNumber = 0;
 
 //WiFiServer server(80);
 ESP8266WebServer server(80);
+
 // Variable to store the HTTP request
 String header;
 
@@ -593,7 +583,7 @@ void AddressRegistry_3110()
     realtimeData.equipmentTemp = node.getResponseBuffer(0x01) / 100.0f;
     DebugPrint("Equipment Temp: ");
     DebugPrintln(realtimeData.equipmentTemp);
-    
+
     realtimeData.heatsinkTemp = node.getResponseBuffer(0x02) / 100.0f;
     DebugPrint("Heatsink Temp: ");
     DebugPrintln(realtimeData.heatsinkTemp);

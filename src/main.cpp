@@ -51,7 +51,7 @@ struct rated_data
   float loadCurrent;
 } ratedData;
 
-//realtime status
+//realtime data
 struct realtime_data
 {
   float pvVoltage;
@@ -70,6 +70,13 @@ struct realtime_data
   float batteryRemoteTemp;
   uint16_t batteryRatedPower; //1200,2400 for 12/12v
 } realtimeData;
+
+//realtime status
+struct realtime_status
+{
+  byte batteryStatus;
+  byte equpimentStatus;
+} realtimeStatus;
 
 //statistical parameters
 struct statistical_parameters

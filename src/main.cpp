@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-//#define DEBUG
+#define DEBUG
 #define DEBUG_OI Serial
 #include "debug.h"
 
@@ -185,20 +185,22 @@ void executeCurrentRegistryFunction();
 void nextRegistryNumber();
 
 void AddressRegistry_3100();
-void AddressRegistry_3106();
-void AddressRegistry_3111();
-void AddressRegistry_310D();
+// void AddressRegistry_3106();
+void AddressRegistry_3110();
+void AddressRegistry_310C();
 void AddressRegistry_311A();
+void AddressRegistry_311D();
 void AddressRegistry_331B();
 
 // a list of the regisities to query in order
 typedef void (*RegistryList[])();
 RegistryList Registries = {
     AddressRegistry_3100,
-    AddressRegistry_3106,
-    AddressRegistry_3111,
-    AddressRegistry_310D,
+    AddressRegistry_310C,
+    // AddressRegistry_3106,
+    AddressRegistry_3110,
     AddressRegistry_311A,
+    AddressRegistry_311D,
     AddressRegistry_331B,
 };
 // keep log of where we are
@@ -517,7 +519,7 @@ void nextRegistryNumber()
 
 void AddressRegistry_3100()
 {
-  result = node.readInputRegisters(0x3100, 6);
+  result = node.readInputRegisters(0x3100, 8);
 
   if (result == node.ku8MBSuccess)
   {
@@ -540,44 +542,40 @@ void AddressRegistry_3100()
     realtimeStatus.batteryChargingCurrent = node.getResponseBuffer(0x05) / 100.0f;
     DebugPrint("Battery Charge Current: ");
     DebugPrintln(realtimeStatus.batteryChargingCurrent);
-  }
-}
 
-void AddressRegistry_3106()
-{
-  result = node.readInputRegisters(0x3106, 2);
-
-  if (result == node.ku8MBSuccess)
-  {
-    realtimeStatus.batteryChargingPower = (node.getResponseBuffer(0x00) | node.getResponseBuffer(0x01) << 16) / 100.0f;
+    realtimeStatus.batteryChargingPower = (node.getResponseBuffer(0x06) | node.getResponseBuffer(0x07) << 16) / 100.0f;
     DebugPrint("Battery Charge Power: ");
     DebugPrintln(realtimeStatus.batteryChargingPower);
   }
 }
 
-void AddressRegistry_3111()
+// void AddressRegistry_3106()
+// {
+//   result = node.readInputRegisters(0x3106, 2);
+
+//   if (result == node.ku8MBSuccess)
+//   {
+//     realtimeStatus.batteryChargingPower = (node.getResponseBuffer(0x00) | node.getResponseBuffer(0x01) << 16) / 100.0f;
+//     DebugPrint("Battery Charge Power: ");
+//     DebugPrintln(realtimeStatus.batteryChargingPower);
+//   }
+// }
+
+void AddressRegistry_310C()
 {
-  result = node.readInputRegisters(0x3111, 1);
+  result = node.readInputRegisters(0x310C, 4);
 
   if (result == node.ku8MBSuccess)
   {
-    realtimeStatus.equipmentTemp = node.getResponseBuffer(0x00) / 100.0f;
-    DebugPrint("Equipment Temp: ");
-    DebugPrintln(realtimeStatus.equipmentTemp);
-  }
-}
+    realtimeStatus.loadVoltage = node.getResponseBuffer(0x00) / 100.0f;
+    DebugPrint("Load Voltage: ");
+    DebugPrintln(realtimeStatus.loadCurrent);
 
-void AddressRegistry_310D()
-{
-  result = node.readInputRegisters(0x310D, 3);
-
-  if (result == node.ku8MBSuccess)
-  {
-    realtimeStatus.loadCurrent = node.getResponseBuffer(0x00) / 100.0f;
+    realtimeStatus.loadCurrent = node.getResponseBuffer(0x01) / 100.0f;
     DebugPrint("Load Current: ");
     DebugPrintln(realtimeStatus.loadCurrent);
 
-    realtimeStatus.loadPower = (node.getResponseBuffer(0x01) | node.getResponseBuffer(0x02) << 16) / 100.0f;
+    realtimeStatus.loadPower = (node.getResponseBuffer(0x02) | node.getResponseBuffer(0x03) << 16) / 100.0f;
     DebugPrint("Load Power: ");
     DebugPrintln(realtimeStatus.loadPower);
   }
@@ -585,6 +583,26 @@ void AddressRegistry_310D()
   {
     rs485DataReceived = false;
     DebugPrintln("Read register 0x310D failed!");
+  }
+}
+
+void AddressRegistry_3110()
+{
+  result = node.readInputRegisters(0x3110, 3);
+
+  if (result == node.ku8MBSuccess)
+  {
+    realtimeStatus.batteryTemp = node.getResponseBuffer(0x00) / 100.0f;
+    DebugPrint("Battery Temp: ");
+    DebugPrintln(realtimeStatus.batteryTemp);
+
+    realtimeStatus.equipmentTemp = node.getResponseBuffer(0x01) / 100.0f;
+    DebugPrint("Equipment Temp: ");
+    DebugPrintln(realtimeStatus.equipmentTemp);
+    
+    realtimeStatus.heatsinkTemp = node.getResponseBuffer(0x02) / 100.0f;
+    DebugPrint("Heatsink Temp: ");
+    DebugPrintln(realtimeStatus.heatsinkTemp);
   }
 }
 
@@ -601,11 +619,33 @@ void AddressRegistry_311A()
     realtimeStatus.batteryTemp = node.getResponseBuffer(0x01) / 100.0f;
     DebugPrint("Battery Temperature: ");
     DebugPrintln(realtimeStatus.batteryTemp);
+
+    // realtimeStatus.batteryRatedPower = node.getResponseBuffer(0x03) / 100.0f;
+    // DebugPrint("Battery Rated Power: ");
+    // DebugPrintln(realtimeStatus.batteryRatedPower);
+
   }
   else
   {
     rs485DataReceived = false;
     DebugPrintln("Read register 0x311A failed!");
+  }
+}
+
+void AddressRegistry_311D()
+{
+  result = node.readInputRegisters(0x311D, 1);
+
+  if (result == node.ku8MBSuccess)
+  {
+    realtimeStatus.batteryRatedPower = node.getResponseBuffer(0x00) / 100.0f;
+    DebugPrint("Battery Rated Power: ");
+    DebugPrintln(realtimeStatus.batteryRatedPower);
+  }
+  else
+  {
+    rs485DataReceived = false;
+    DebugPrintln("Read register 0x311D failed!");
   }
 }
 

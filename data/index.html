@@ -15,20 +15,20 @@
         if (this.readyState == 4 && this.status == 200) {
           console.log("updateData(): got Data:", this.responseText);
           var data = JSON.parse(this.responseText);
-          document.getElementById("pv_power").innerHTML = data.pv_power.toFixed(0) + " W";
-          document.getElementById("pv_current").innerHTML = data.pv_current.toFixed(2) + " A";
-          document.getElementById("pv_voltage").innerHTML = data.pv_voltage.toFixed(2) + " V";
-          document.getElementById("load_current").innerHTML = data.load_current.toFixed(2) + " A";
-          document.getElementById("load_power").innerHTML = data.load_power.toFixed(0) + " W";
-          document.getElementById("batt_temp").innerHTML = data.batt_temp.toFixed(2) + " &deg;C";
-          document.getElementById("batt_voltage").innerHTML = data.batt_voltage.toFixed(2) + " V";
-          document.getElementById("batt_current").innerHTML = data.batt_current.toFixed(2) + " A";
-          document.getElementById("batt_remain").innerHTML = data.batt_remain.toFixed(2) + " %";
-          document.getElementById("batt_charge_power").innerHTML = data.batt_charge_power.toFixed(0) + " W";
-          document.getElementById("case_temp").innerHTML = data.case_temp.toFixed(2) + " &deg;C";
+          document.getElementById("pvVoltage").innerHTML = data.pvVoltage.toFixed(2) + " V";
+          document.getElementById("pvCurrent").innerHTML = data.pvCurrent.toFixed(2) + " A";
+          document.getElementById("pvPower").innerHTML = data.pvPower.toFixed(0) + " W";
+          document.getElementById("batteryVoltage").innerHTML = data.batteryVoltage.toFixed(2) + " V";
+          document.getElementById("batteryChargingCurrent").innerHTML = data.batteryChargingCurrent.toFixed(2) + " A";
+          document.getElementById("batteryChargingPower").innerHTML = data.batteryChargingPower.toFixed(0) + " W";
+          document.getElementById("loadCurrent").innerHTML = data.loadCurrent.toFixed(2) + " A";
+          document.getElementById("loadPower").innerHTML = data.loadPower.toFixed(0) + " W";
+          document.getElementById("batteryTemp").innerHTML = data.batteryTemp.toFixed(2) + " &deg;C";
+          document.getElementById("equipmentTemp").innerHTML = data.equipTemp.toFixed(2) + " &deg;C";
+          document.getElementById("batterySoC").innerHTML = data.batterySoC.toFixed(0) + " %";
         }
       };
-      xhttp.open("GET", "/getData", true);
+      xhttp.open("GET", "/getRealtimeData", true);
       xhttp.send();
     }
 
@@ -54,52 +54,48 @@
       <th width="100px">Value</th>
     </tr>
     <tr>
-      <td>PV Power</td>
-      <td id="pv_power"></td>
-    </tr>
+      <td>PV Voltage</td>
+      <td id="pvVoltage"></td>
+    </tr>    
     <tr>
       <td>PV Current</td>
-      <td id="pv_current"></td>
+      <td id="pvCurrent"></td>
     </tr>
     <tr>
-      <td>PV Voltage</td>
-      <td id="pv_voltage"></td>
-    </tr>
-
-    <tr>
-      <td>Load Current</td>
-      <td id="load_current"></td>
-    </tr>
-    <tr>
-      <td>Load Power</td>
-      <td id="load_power"></td>
-    </tr>
-
-    <tr>
-      <td>Battery Temp</td>
-      <td id="batt_temp"></td>
+      <td>PV Power</td>
+      <td id="pvPower"></td>
     </tr>
     <tr>
       <td>Battery Voltage</td>
-      <td id="batt_voltage"></td>
+      <td id="batteryVoltage"></td>
     </tr>
     <tr>
-      <td>Battery Current</td>
-      <td id="batt_current"></td>
+      <td>Battery Charging Current</td>
+      <td id="batteryChargingCurrent"></td>
     </tr>
-    <tr>
-      <td>Battery Remaining</td>
-      <td id="batt_remain"></td>
-    </tr>
-
     <tr>
       <td>Battery Charge Power</td>
-      <td id="batt_charge_power"></td>
+      <td id="batteryChargingPower"></td>
     </tr>
-
     <tr>
-      <td>Case Temp</td>
-      <td id="case_temp"></td>
+      <td>Load Current</td>
+      <td id="loadCurrent"></td>
+    </tr>
+    <tr>
+      <td>Load Power</td>
+      <td id="loadPower"></td>
+    </tr>
+    <tr>
+      <td>Battery Temp</td>
+      <td id="batteryTemp"></td>
+    </tr>
+    <tr>
+      <td>Equipment Temp</td>
+      <td id="equipmentTemp"></td>
+    </tr>
+    <tr>
+      <td>Battery SoC</td>
+      <td id="batterySoC"></td>
     </tr>
 
   </table>

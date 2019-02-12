@@ -58,9 +58,9 @@ struct realtime_status
   float loadCurrent;
   int16_t loadPower;
   float batteryTemp;
-  float equipTemp;
+  float equipmentTemp;
   float heatsinkTemp;
-  uint8_t batterySoc;
+  uint8_t batterySoC;
   float batteryRemoteTemp;
   uint16_t batteryRatedPower; //1200,2400 for 12/12v
 } realtimeStatus;
@@ -335,7 +335,25 @@ void loop()
   delay(100);
 }
 
-void getData()
+void getRealtimeData()
+{
+  server.send(200, "application/json",
+              "{\"pvVoltage\":" + String(realtimeStatus.pvVoltage) +
+                  ", \"pvCurrent\":" + String(realtimeStatus.pvCurrent) +
+                  ", \"pvPower\":" + String(realtimeStatus.pvPower) +
+                  ", \"batteryVoltage\":" + String(realtimeStatus.batteryVoltage) +
+                  ", \"batteryChargingCurrent\":" + String(realtimeStatus.batteryChargingCurrent) +
+                  ", \"batteryChargingPower\":" + String(realtimeStatus.batteryChargingPower) +
+                  ", \"loadVoltage\":" + String(realtimeStatus.loadVoltage) +
+                  ", \"loadCurrent\":" + String(realtimeStatus.loadCurrent) +
+                  ", \"loadPower\":" + String(realtimeStatus.loadPower) +
+                  ", \"batteryTemp\":" + String(realtimeStatus.batteryTemp) +
+                  ", \"equipmentTemp\":" + String(realtimeStatus.equipmentTemp) +
+                  ", \"heatsinkTemp\":" + String(realtimeStatus.heatsinkTemp) +
+                  ", \"batterySoC\":" + String(realtimeStatus.batterySoC) +
+                  ", \"batteryRemoteTemp\":" + String(realtimeStatus.batteryRemoteTemp) +
+                  ", \"batteryRatedPower\":" + String(realtimeStatus.batteryRatedPower) + "}");
+}
 {
   server.send(200, "application/json",
               "{\"pv_power\":" + String(realtimeStatus.pvPower) +

@@ -530,9 +530,9 @@ void AddressRegistry_3111()
 
   if (result == node.ku8MBSuccess)
   {
-    realtimeStatus.equipTemp = node.getResponseBuffer(0x00) / 100.0f;
+    realtimeStatus.equipmentTemp = node.getResponseBuffer(0x00) / 100.0f;
     DebugPrint("Equipment Temp: ");
-    DebugPrintln(realtimeStatus.equipTemp);
+    DebugPrintln(realtimeStatus.equipmentTemp);
   }
 }
 
@@ -563,9 +563,9 @@ void AddressRegistry_311A()
 
   if (result == node.ku8MBSuccess)
   {
-    realtimeStatus.batterySoc = node.getResponseBuffer(0x00) / 1.0f;
-    DebugPrint("Battery Remaining %: ");
-    DebugPrintln(realtimeStatus.batterySoc);
+    realtimeStatus.batterySoC = node.getResponseBuffer(0x00) / 1.0f;
+    DebugPrint("Battery State of Charge %: ");
+    DebugPrintln(realtimeStatus.batterySoC);
 
     realtimeStatus.batteryTemp = node.getResponseBuffer(0x01) / 100.0f;
     DebugPrint("Battery Temperature: ");

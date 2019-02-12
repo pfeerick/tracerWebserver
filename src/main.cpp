@@ -31,6 +31,12 @@ uint8_t result;
 // 0x01      | ProductCode                | ASCII String | Mandatory | 
 // 0x02      | MajorMinorRevision         | ASCII String | Mandatory | Basic  
 
+struct device_id
+{
+  String vendorName;
+  String productCode;
+  String version;
+} deviceID;
 
 //rated data
 struct rated_data

@@ -28,7 +28,7 @@
           document.getElementById("heatsinkTemp").innerHTML = data.heatsinkTemp.toFixed(2) + " &deg;C";
           document.getElementById("batterySoC").innerHTML = data.batterySoC.toFixed(0) + " %";
           document.getElementById("batteryRemoteTemp").innerHTML = data.batteryRemoteTemp.toFixed(2) + " &deg;C";
-          document.getElementById("batteryRatedPower").innerHTML = data.batteryRatedPower.toFixed(0) + " W";
+          document.getElementById("batteryRatedPower").innerHTML = data.batteryRatedPower.toFixed(0) + " V";
         }
       };
       xhttp.open("GET", "/getRealtimeData", true);

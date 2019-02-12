@@ -168,9 +168,11 @@ bool loadPoweredOn = true;
 ModbusMaster node;
 Timer timer;
 
-// tracer requires no handshaking
-void getData();
+//web server json responders
+void getRatedData();
+void getRealtimeData();
 
+// tracer requires no handshaking
 void preTransmission() {}
 void postTransmission() {}
 
@@ -314,7 +316,8 @@ void setup()
   });
 
   server.serveStatic("/", SPIFFS, "/index.html");
-  server.on("/getData", getData);
+  server.on("/getRatedData", getRatedData);
+  server.on("/getRealtimeData", getRealtimeData);
 
   server.begin(); // Actually start the server
   DebugPrintln("HTTP server started");
@@ -339,6 +342,19 @@ void loop()
 
   server.handleClient();
   delay(100);
+}
+
+void getRatedData()
+{
+  server.send(200, "application/json",
+              "{\"pvVoltage\":" + String(ratedData.pvVoltage) +
+                  ", \"pvCurrent\":" + String(ratedData.pvCurrent) +
+                  ", \"pvPower\":" + String(ratedData.pvPower) +
+                  ", \"batteryVoltage\":" + String(ratedData.batteryVoltage) +
+                  ", \"batteryCurrent\":" + String(ratedData.batteryCurrent) +
+                  ", \"batteryPower\":" + String(ratedData.batteryPower) +
+                  ", \"chargingMode\":" + String(ratedData.chargingMode) +
+                  ", \"loadCurrent\":" + String(ratedData.loadCurrent) + "}");
 }
 
 void getRealtimeData()

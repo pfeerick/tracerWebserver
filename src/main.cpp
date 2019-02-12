@@ -197,7 +197,6 @@ typedef void (*RegistryList[])();
 RegistryList Registries = {
     AddressRegistry_3100,
     AddressRegistry_310C,
-    // AddressRegistry_3106,
     AddressRegistry_3110,
     AddressRegistry_311A,
     AddressRegistry_311D,
@@ -549,18 +548,6 @@ void AddressRegistry_3100()
   }
 }
 
-// void AddressRegistry_3106()
-// {
-//   result = node.readInputRegisters(0x3106, 2);
-
-//   if (result == node.ku8MBSuccess)
-//   {
-//     realtimeStatus.batteryChargingPower = (node.getResponseBuffer(0x00) | node.getResponseBuffer(0x01) << 16) / 100.0f;
-//     DebugPrint("Battery Charge Power: ");
-//     DebugPrintln(realtimeStatus.batteryChargingPower);
-//   }
-// }
-
 void AddressRegistry_310C()
 {
   result = node.readInputRegisters(0x310C, 4);
@@ -619,11 +606,6 @@ void AddressRegistry_311A()
     realtimeStatus.batteryTemp = node.getResponseBuffer(0x01) / 100.0f;
     DebugPrint("Battery Temperature: ");
     DebugPrintln(realtimeStatus.batteryTemp);
-
-    // realtimeStatus.batteryRatedPower = node.getResponseBuffer(0x03) / 100.0f;
-    // DebugPrint("Battery Rated Power: ");
-    // DebugPrintln(realtimeStatus.batteryRatedPower);
-
   }
   else
   {

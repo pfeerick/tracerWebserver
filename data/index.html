@@ -7,13 +7,12 @@
   <meta charset="UTF-8">
   <link rel="stylesheet" href="styles.css">
   <script>
-    function updateData() {
-      //document.getElementById("reloadCB").checked=true;
-      console.log("updateData()");
+    function updateRealtimeData() {
+      console.log("updateRealtimeData()");
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-          console.log("updateData(): got Data:", this.responseText);
+          console.log("updateRealtimeData(): got Data:", this.responseText);
           var data = JSON.parse(this.responseText);
           document.getElementById("pvVoltage").innerHTML = data.pvVoltage.toFixed(2) + " V";
           document.getElementById("pvCurrent").innerHTML = data.pvCurrent.toFixed(2) + " A";
@@ -21,11 +20,15 @@
           document.getElementById("batteryVoltage").innerHTML = data.batteryVoltage.toFixed(2) + " V";
           document.getElementById("batteryChargingCurrent").innerHTML = data.batteryChargingCurrent.toFixed(2) + " A";
           document.getElementById("batteryChargingPower").innerHTML = data.batteryChargingPower.toFixed(0) + " W";
+          document.getElementById("loadVoltage").innerHTML = data.loadVoltage.toFixed(2) + " V";
           document.getElementById("loadCurrent").innerHTML = data.loadCurrent.toFixed(2) + " A";
           document.getElementById("loadPower").innerHTML = data.loadPower.toFixed(0) + " W";
           document.getElementById("batteryTemp").innerHTML = data.batteryTemp.toFixed(2) + " &deg;C";
-          document.getElementById("equipmentTemp").innerHTML = data.equipTemp.toFixed(2) + " &deg;C";
+          document.getElementById("equipmentTemp").innerHTML = data.equipmentTemp.toFixed(2) + " &deg;C";
+          document.getElementById("heatsinkTemp").innerHTML = data.heatsinkTemp.toFixed(2) + " &deg;C";
           document.getElementById("batterySoC").innerHTML = data.batterySoC.toFixed(0) + " %";
+          document.getElementById("batteryRemoteTemp").innerHTML = data.batteryRemoteTemp.toFixed(2) + " &deg;C";
+          document.getElementById("batteryRatedPower").innerHTML = data.batteryRatedPower.toFixed(0) + " W";
         }
       };
       xhttp.open("GET", "/getRealtimeData", true);
@@ -34,15 +37,15 @@
 
     function toggleAutoRefresh(cb) {
       if (cb.checked) {
-        refreshData = window.setInterval(updateData, 5000);
+        refreshData = window.setInterval(updateRealtimeData, 5000);
       } else {
         clearTimeout(refreshData);
       }
     }
 
-    updateData();
+    updateRealtimeData();
 
-    refreshData = window.setInterval(updateData, 5000); //update the sensordata 5 seconds
+    refreshData = window.setInterval(updateRealtimeData, 5000); //update the sensordata 5 seconds
   </script>
 </head>
 
@@ -56,7 +59,7 @@
     <tr>
       <td>PV Voltage</td>
       <td id="pvVoltage"></td>
-    </tr>    
+    </tr>
     <tr>
       <td>PV Current</td>
       <td id="pvCurrent"></td>
@@ -78,6 +81,10 @@
       <td id="batteryChargingPower"></td>
     </tr>
     <tr>
+      <td>Load Voltage</td>
+      <td id="loadVoltage"></td>
+    </tr>
+    <tr>
       <td>Load Current</td>
       <td id="loadCurrent"></td>
     </tr>
@@ -94,10 +101,21 @@
       <td id="equipmentTemp"></td>
     </tr>
     <tr>
+      <td>Heatsink Temp</td>
+      <td id="heatsinkTemp"></td>
+    </tr>
+    <tr>
       <td>Battery SoC</td>
       <td id="batterySoC"></td>
     </tr>
-
+    <tr>
+      <td>Battery Remote Temp</td>
+      <td id="batteryRemoteTemp"></td>
+    </tr>
+    <tr>
+      <td>Battery Rated Power</td>
+      <td id="batteryRatedPower"></td>
+    </tr>
   </table>
 
   <input type="checkbox" onclick="toggleAutoRefresh(this);" id="reloadCB" checked> Auto Refresh

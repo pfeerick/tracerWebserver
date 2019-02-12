@@ -52,7 +52,7 @@ struct rated_data
 } ratedData;
 
 //realtime status
-struct realtime_status
+struct realtime_data
 {
   float pvVoltage;
   float pvCurrent;
@@ -69,7 +69,7 @@ struct realtime_status
   uint8_t batterySoC;
   float batteryRemoteTemp;
   uint16_t batteryRatedPower; //1200,2400 for 12/12v
-} realtimeStatus;
+} realtimeData;
 
 //statistical parameters
 struct statistical_parameters
@@ -363,21 +363,21 @@ void getRatedData()
 void getRealtimeData()
 {
   server.send(200, "application/json",
-              "{\"pvVoltage\":" + String(realtimeStatus.pvVoltage) +
-                  ", \"pvCurrent\":" + String(realtimeStatus.pvCurrent) +
-                  ", \"pvPower\":" + String(realtimeStatus.pvPower) +
-                  ", \"batteryVoltage\":" + String(realtimeStatus.batteryVoltage) +
-                  ", \"batteryChargingCurrent\":" + String(realtimeStatus.batteryChargingCurrent) +
-                  ", \"batteryChargingPower\":" + String(realtimeStatus.batteryChargingPower) +
-                  ", \"loadVoltage\":" + String(realtimeStatus.loadVoltage) +
-                  ", \"loadCurrent\":" + String(realtimeStatus.loadCurrent) +
-                  ", \"loadPower\":" + String(realtimeStatus.loadPower) +
-                  ", \"batteryTemp\":" + String(realtimeStatus.batteryTemp) +
-                  ", \"equipmentTemp\":" + String(realtimeStatus.equipmentTemp) +
-                  ", \"heatsinkTemp\":" + String(realtimeStatus.heatsinkTemp) +
-                  ", \"batterySoC\":" + String(realtimeStatus.batterySoC) +
-                  ", \"batteryRemoteTemp\":" + String(realtimeStatus.batteryRemoteTemp) +
-                  ", \"batteryRatedPower\":" + String(realtimeStatus.batteryRatedPower) + "}");
+              "{\"pvVoltage\":" + String(realtimeData.pvVoltage) +
+                  ", \"pvCurrent\":" + String(realtimeData.pvCurrent) +
+                  ", \"pvPower\":" + String(realtimeData.pvPower) +
+                  ", \"batteryVoltage\":" + String(realtimeData.batteryVoltage) +
+                  ", \"batteryChargingCurrent\":" + String(realtimeData.batteryChargingCurrent) +
+                  ", \"batteryChargingPower\":" + String(realtimeData.batteryChargingPower) +
+                  ", \"loadVoltage\":" + String(realtimeData.loadVoltage) +
+                  ", \"loadCurrent\":" + String(realtimeData.loadCurrent) +
+                  ", \"loadPower\":" + String(realtimeData.loadPower) +
+                  ", \"batteryTemp\":" + String(realtimeData.batteryTemp) +
+                  ", \"equipmentTemp\":" + String(realtimeData.equipmentTemp) +
+                  ", \"heatsinkTemp\":" + String(realtimeData.heatsinkTemp) +
+                  ", \"batterySoC\":" + String(realtimeData.batterySoC) +
+                  ", \"batteryRemoteTemp\":" + String(realtimeData.batteryRemoteTemp) +
+                  ", \"batteryRatedPower\":" + String(realtimeData.batteryRatedPower) + "}");
 }
 
 void getStatisticalData()
@@ -522,29 +522,29 @@ void AddressRegistry_3100()
 
   if (result == node.ku8MBSuccess)
   {
-    realtimeStatus.pvVoltage = node.getResponseBuffer(0x00) / 100.0f;
+    realtimeData.pvVoltage = node.getResponseBuffer(0x00) / 100.0f;
     DebugPrint("PV Voltage: ");
-    DebugPrintln(realtimeStatus.pvVoltage);
+    DebugPrintln(realtimeData.pvVoltage);
 
-    realtimeStatus.pvCurrent = node.getResponseBuffer(0x01) / 100.0f;
+    realtimeData.pvCurrent = node.getResponseBuffer(0x01) / 100.0f;
     DebugPrint("PV Current: ");
-    DebugPrintln(realtimeStatus.pvCurrent);
+    DebugPrintln(realtimeData.pvCurrent);
 
-    realtimeStatus.pvPower = (node.getResponseBuffer(0x02) | node.getResponseBuffer(0x03) << 16) / 100.0f;
+    realtimeData.pvPower = (node.getResponseBuffer(0x02) | node.getResponseBuffer(0x03) << 16) / 100.0f;
     DebugPrint("PV Power: ");
-    DebugPrintln(realtimeStatus.pvPower);
+    DebugPrintln(realtimeData.pvPower);
 
-    realtimeStatus.batteryVoltage = node.getResponseBuffer(0x04) / 100.0f;
+    realtimeData.batteryVoltage = node.getResponseBuffer(0x04) / 100.0f;
     DebugPrint("Battery Voltage: ");
-    DebugPrintln(realtimeStatus.batteryVoltage);
+    DebugPrintln(realtimeData.batteryVoltage);
 
-    realtimeStatus.batteryChargingCurrent = node.getResponseBuffer(0x05) / 100.0f;
+    realtimeData.batteryChargingCurrent = node.getResponseBuffer(0x05) / 100.0f;
     DebugPrint("Battery Charge Current: ");
-    DebugPrintln(realtimeStatus.batteryChargingCurrent);
+    DebugPrintln(realtimeData.batteryChargingCurrent);
 
-    realtimeStatus.batteryChargingPower = (node.getResponseBuffer(0x06) | node.getResponseBuffer(0x07) << 16) / 100.0f;
+    realtimeData.batteryChargingPower = (node.getResponseBuffer(0x06) | node.getResponseBuffer(0x07) << 16) / 100.0f;
     DebugPrint("Battery Charge Power: ");
-    DebugPrintln(realtimeStatus.batteryChargingPower);
+    DebugPrintln(realtimeData.batteryChargingPower);
   }
 }
 
@@ -554,17 +554,17 @@ void AddressRegistry_310C()
 
   if (result == node.ku8MBSuccess)
   {
-    realtimeStatus.loadVoltage = node.getResponseBuffer(0x00) / 100.0f;
+    realtimeData.loadVoltage = node.getResponseBuffer(0x00) / 100.0f;
     DebugPrint("Load Voltage: ");
-    DebugPrintln(realtimeStatus.loadCurrent);
+    DebugPrintln(realtimeData.loadCurrent);
 
-    realtimeStatus.loadCurrent = node.getResponseBuffer(0x01) / 100.0f;
+    realtimeData.loadCurrent = node.getResponseBuffer(0x01) / 100.0f;
     DebugPrint("Load Current: ");
-    DebugPrintln(realtimeStatus.loadCurrent);
+    DebugPrintln(realtimeData.loadCurrent);
 
-    realtimeStatus.loadPower = (node.getResponseBuffer(0x02) | node.getResponseBuffer(0x03) << 16) / 100.0f;
+    realtimeData.loadPower = (node.getResponseBuffer(0x02) | node.getResponseBuffer(0x03) << 16) / 100.0f;
     DebugPrint("Load Power: ");
-    DebugPrintln(realtimeStatus.loadPower);
+    DebugPrintln(realtimeData.loadPower);
   }
   else
   {
@@ -579,17 +579,17 @@ void AddressRegistry_3110()
 
   if (result == node.ku8MBSuccess)
   {
-    realtimeStatus.batteryTemp = node.getResponseBuffer(0x00) / 100.0f;
+    realtimeData.batteryTemp = node.getResponseBuffer(0x00) / 100.0f;
     DebugPrint("Battery Temp: ");
-    DebugPrintln(realtimeStatus.batteryTemp);
+    DebugPrintln(realtimeData.batteryTemp);
 
-    realtimeStatus.equipmentTemp = node.getResponseBuffer(0x01) / 100.0f;
+    realtimeData.equipmentTemp = node.getResponseBuffer(0x01) / 100.0f;
     DebugPrint("Equipment Temp: ");
-    DebugPrintln(realtimeStatus.equipmentTemp);
+    DebugPrintln(realtimeData.equipmentTemp);
     
-    realtimeStatus.heatsinkTemp = node.getResponseBuffer(0x02) / 100.0f;
+    realtimeData.heatsinkTemp = node.getResponseBuffer(0x02) / 100.0f;
     DebugPrint("Heatsink Temp: ");
-    DebugPrintln(realtimeStatus.heatsinkTemp);
+    DebugPrintln(realtimeData.heatsinkTemp);
   }
 }
 
@@ -599,13 +599,13 @@ void AddressRegistry_311A()
 
   if (result == node.ku8MBSuccess)
   {
-    realtimeStatus.batterySoC = node.getResponseBuffer(0x00) / 1.0f;
+    realtimeData.batterySoC = node.getResponseBuffer(0x00) / 1.0f;
     DebugPrint("Battery State of Charge %: ");
-    DebugPrintln(realtimeStatus.batterySoC);
+    DebugPrintln(realtimeData.batterySoC);
 
-    realtimeStatus.batteryTemp = node.getResponseBuffer(0x01) / 100.0f;
+    realtimeData.batteryTemp = node.getResponseBuffer(0x01) / 100.0f;
     DebugPrint("Battery Temperature: ");
-    DebugPrintln(realtimeStatus.batteryTemp);
+    DebugPrintln(realtimeData.batteryTemp);
   }
   else
   {
@@ -620,9 +620,9 @@ void AddressRegistry_311D()
 
   if (result == node.ku8MBSuccess)
   {
-    realtimeStatus.batteryRatedPower = node.getResponseBuffer(0x00) / 100.0f;
+    realtimeData.batteryRatedPower = node.getResponseBuffer(0x00) / 100.0f;
     DebugPrint("Battery Rated Power: ");
-    DebugPrintln(realtimeStatus.batteryRatedPower);
+    DebugPrintln(realtimeData.batteryRatedPower);
   }
   else
   {

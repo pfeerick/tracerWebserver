@@ -163,6 +163,7 @@ void getRatedData();
 void getRealtimeData();
 void getRealtimeStatus();
 void getStatisticalData();
+void getDiscreteInput();
 
 // tracer requires no handshaking
 void preTransmission() {}
@@ -174,6 +175,9 @@ uint8_t setOutputLoadPower(uint8_t state);
 
 void executeCurrentRegistryFunction();
 void nextRegistryNumber();
+
+void AddressRegistry_2000();
+void AddressRegistry_200C();
 
 void AddressRegistry_3000();
 void AddressRegistry_300E();
@@ -194,6 +198,8 @@ void AddressRegistry_331B();
 // a list of the regisities to query in order
 typedef void (*RegistryList[])();
 RegistryList Registries = {
+    AddressRegistry_2000,
+    AddressRegistry_200C,
     AddressRegistry_3000,
     AddressRegistry_300E,
     AddressRegistry_3100,
@@ -328,6 +334,7 @@ void setup()
   server.on("/getRealtimeData", getRealtimeData);
   server.on("/getRealtimeStatus", getRealtimeStatus);
   server.on("/getStatisticalData", getStatisticalData);
+  server.on("/getDiscreteInput", getDiscreteInput);
 
   server.begin(); // Actually start the server
   DebugPrintln("HTTP server started");
@@ -414,6 +421,13 @@ void getStatisticalData()
                   ", \"batteryCurrent\":" + String(statisticalParameters.batteryCurrent) +
                   ", \"batteryTemp\":" + String(statisticalParameters.batteryTemp) +
                   ", \"ambientTemp\":" + String(statisticalParameters.ambientTemp) + "}");
+}
+
+void getDiscreteInput()
+{
+  server.send(200, "application/json",
+              "{\"overTemp\":" + String(discreteInput.overTemp) +
+                  ", \"dayNight\":" + String(discreteInput.dayNight) + "}");
 }
 
 String getContentType(String filename)
@@ -528,6 +542,40 @@ void nextRegistryNumber()
   if (currentRegistryNumber >= ARRAY_SIZE(Registries))
   {
     currentRegistryNumber = 0;
+  }
+}
+
+void AddressRegistry_2000()
+{
+  result = node.readDiscreteInputs(0x2000, 1);
+
+  if (result == node.ku8MBSuccess)
+  {
+    discreteInput.overTemp = node.getResponseBuffer(0x00);
+    DebugPrint("Over temperature inside device: ");
+    DebugPrintln(discreteInput.overTemp);
+  }
+  else
+  {
+    rs485DataReceived = false;
+    DebugPrintln("Read discrete input 0x2000 failed!");
+  }
+}
+
+void AddressRegistry_200C()
+{
+  result = node.readDiscreteInputs(0x200C, 1);
+
+  if (result == node.ku8MBSuccess)
+  {
+    discreteInput.dayNight = node.getResponseBuffer(0x00);
+    DebugPrint("Day/Night: ");
+    DebugPrintln(discreteInput.dayNight);
+  }
+  else
+  {
+    rs485DataReceived = false;
+    DebugPrintln("Read discrete input 0x200C failed!");
   }
 }
 

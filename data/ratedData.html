@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>ESP8266 Tracer Dashboard - Rated Data</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    function updateRatedData() {
+      console.log("updateRatedData()");
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          console.log("updateRatedData(): got Data:", this.responseText);
+          var data = JSON.parse(this.responseText);
+          document.getElementById("pvVoltage").innerHTML = data.pvVoltage.toFixed(0) + " V";
+          document.getElementById("pvCurrent").innerHTML = data.pvCurrent.toFixed(0) + " A";
+          document.getElementById("pvPower").innerHTML = data.pvPower.toFixed(0) + " W";
+          document.getElementById("batteryVoltage").innerHTML = data.batteryVoltage.toFixed(0) + " V";
+          document.getElementById("batteryCurrent").innerHTML = data.batteryCurrent.toFixed(0) + " A";
+          document.getElementById("batteryPower").innerHTML = data.batteryPower.toFixed(0) + " W";
+          document.getElementById("chargingMode").innerHTML = data.chargingMode.toFixed(0)
+          document.getElementById("loadCurrent").innerHTML = data.loadCurrent.toFixed(0) + " A";
+        }
+      };
+      xhttp.open("GET", "/getRatedData", true);
+      xhttp.send();
+    }
+
+    function toggleAutoRefresh(cb) {
+      if (cb.checked) {
+        refreshData = window.setInterval(getRatedData, 5000);
+      } else {
+        clearTimeout(refreshData);
+      }
+    }
+
+    updateRatedData();
+
+    refreshData = window.setInterval(updateRatedData, 5000); //update the sensordata 5 seconds
+  </script>
+</head>
+
+<body>
+  <h1>ESP8266 Tracer Dashboard</h1>
+  <table class='data-table'>
+    <tr>
+      <th width="200px">Rated Data</th>
+      <th width="100px">Value</th>
+    </tr>
+    <tr>
+      <td>PV Voltage</td>
+      <td id="pvVoltage"></td>
+    </tr>
+    <tr>
+      <td>PV Current</td>
+      <td id="pvCurrent"></td>
+    </tr>
+    <tr>
+      <td>PV Power</td>
+      <td id="pvPower"></td>
+    </tr>
+    <tr>
+      <td>Battery Voltage</td>
+      <td id="batteryVoltage"></td>
+    </tr>
+    <tr>
+      <td>Battery Current</td>
+      <td id="batteryCurrent"></td>
+    </tr>
+    <tr>
+      <td>Battery Power</td>
+      <td id="batteryPower"></td>
+    </tr>
+    <tr>
+      <td>Charging Mode</td>
+      <td id="chargingMode"></td>
+    </tr>
+    <tr>
+      <td>Load Current</td>
+      <td id="loadCurrent"></td>
+    </tr>
+  </table>
+
+  <input type="checkbox" onclick="toggleAutoRefresh(this);" id="reloadCB" checked> Auto Refresh
+
+</body>
+
+</html>

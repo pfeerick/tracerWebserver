@@ -20,13 +20,6 @@
 
 uint8_t result;
 
-struct device_id
-{
-  String vendorName;
-  String productCode;
-  String version;
-} deviceID;
-
 //rated data
 struct rated_data
 {

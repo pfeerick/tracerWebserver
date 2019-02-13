@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>ESP8266 Tracer Dashboard - Statistical Data</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    function updateStatisticalData() {
+      console.log("updateStatisticalData()");
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          console.log("updateStatisticalData(): got Data:", this.responseText);
+          var data = JSON.parse(this.responseText);
+          document.getElementById("todayMaxPvVoltage").innerHTML = data.pvVoltage.toFixed(2) + " V";
+        }
+      };
+      xhttp.open("GET", "/getStatisticalData", true);
+      xhttp.send();
+    }
+
+    function toggleAutoRefresh(cb) {
+      if (cb.checked) {
+        refreshData = window.setInterval(updateStatisticalData, 5000);
+      } else {
+        clearTimeout(refreshData);
+      }
+    }
+
+    updateStatisticalData();
+
+    refreshData = window.setInterval(updateStatisticalData, 5000); //update the sensordata 5 seconds
+  </script>
+</head>
+
+<body>
+  <h1>ESP8266 Tracer Dashboard</h1>
+  <table class='data-table'>
+    <tr>
+      <th width="200px">Statistical Data</th>
+      <th width="100px">Value</th>
+    </tr>
+    <tr>
+      <td>PV Voltage</td>
+      <td id="todayMaxPvVoltage"></td>
+    </tr>    
+
+  </table>
+
+  <input type="checkbox" onclick="toggleAutoRefresh(this);" id="reloadCB" checked> Auto Refresh
+
+</body>
+
+</html>

@@ -182,6 +182,9 @@ void AddressRegistry_3110();
 void AddressRegistry_311A();
 void AddressRegistry_311D();
 
+void AddressRegistry_3300();
+void AddressRegistry_3310();
+void AddressRegistry_330A();
 void AddressRegistry_331B();
 
 // a list of the regisities to query in order
@@ -194,6 +197,9 @@ RegistryList Registries = {
     AddressRegistry_3110,
     AddressRegistry_311A,
     AddressRegistry_311D,
+    AddressRegistry_3300,
+    AddressRegistry_330A,
+    AddressRegistry_3310,
     AddressRegistry_331B,
 };
 // keep log of where we are
@@ -694,15 +700,116 @@ void AddressRegistry_311D()
   }
 }
 
+void AddressRegistry_3300()
+{
+  result = node.readInputRegisters(0x3300, 16);
+
+  if (result == node.ku8MBSuccess)
+  {
+    statisticalParameters.todayMaxPvVoltage = node.getResponseBuffer(0x00) / 100.0f;
+    DebugPrint("Maximum PV today: ");
+    DebugPrintln(statisticalParameters.todayMaxPvVoltage);
+
+    statisticalParameters.todayMinPvVoltage = node.getResponseBuffer(0x01) / 100.0f;
+    DebugPrint("Minimum PV today: ");
+    DebugPrintln(statisticalParameters.todayMinPvVoltage);
+
+    statisticalParameters.todayMaxBattVoltage = node.getResponseBuffer(0x02) / 100.0f;
+    DebugPrint("Maximum Battery today: ");
+    DebugPrintln(statisticalParameters.todayMaxBattVoltage);
+
+    statisticalParameters.todayMinBattVoltage = node.getResponseBuffer(0x03) / 100.0f;
+    DebugPrint("Minimum Battery today: ");
+    DebugPrintln(statisticalParameters.todayMinBattVoltage);
+
+    statisticalParameters.todayConsumedEnergy = (node.getResponseBuffer(0x04) | node.getResponseBuffer(0x05) << 16) / 100.0f;
+    DebugPrint("Consumed energy today: ");
+    DebugPrintln(statisticalParameters.todayConsumedEnergy);
+
+    statisticalParameters.monthConsumedEnergy = (node.getResponseBuffer(0x06) | node.getResponseBuffer(0x07) << 16) / 100.0f;
+    DebugPrint("Consumed energy this month: ");
+    DebugPrintln(statisticalParameters.monthConsumedEnergy);
+
+    statisticalParameters.yearConsumedEnergy = (node.getResponseBuffer(0x08) | node.getResponseBuffer(0x09) << 16) / 100.0f;
+    DebugPrint("Consumed energy this year: ");
+    DebugPrintln(statisticalParameters.yearConsumedEnergy);
+  }
+  else
+  {
+    rs485DataReceived = false;
+    DebugPrintln("Read register 0x3300 failed!");
+  }
+}
+
+void AddressRegistry_330A()
+{
+  result = node.readInputRegisters(0x330A, 6);
+
+  if (result == node.ku8MBSuccess)
+  {
+    statisticalParameters.totalConsumedEnergy = (node.getResponseBuffer(0x00) | node.getResponseBuffer(0x01) << 16) / 100.0f;
+    DebugPrint("Total consumed energy: ");
+    DebugPrintln(statisticalParameters.totalConsumedEnergy);
+
+    statisticalParameters.todayGeneratedEnergy = (node.getResponseBuffer(0x02) | node.getResponseBuffer(0x03) << 16) / 100.0f;
+    DebugPrint("Generated energy today: ");
+    DebugPrintln(statisticalParameters.todayGeneratedEnergy);
+
+    statisticalParameters.monthGeneratedEnergy = (node.getResponseBuffer(0x04) | node.getResponseBuffer(0x05) << 16) / 100.0f;
+    DebugPrint("Generated energy this month: ");
+    DebugPrintln(statisticalParameters.monthGeneratedEnergy);
+  }
+  else
+  {
+    rs485DataReceived = false;
+    DebugPrintln("Read register 0x330A failed!");
+  }
+}
+
+
+
+void AddressRegistry_3310()
+{
+  result = node.readInputRegisters(0x3310, 6);
+
+  if (result == node.ku8MBSuccess)
+  {
+    statisticalParameters.yearGeneratedEnergy = (node.getResponseBuffer(0x00) | node.getResponseBuffer(0x01) << 16) / 100.0f;
+    DebugPrint("Generated energy this year: ");
+    DebugPrintln(statisticalParameters.yearGeneratedEnergy);
+
+    statisticalParameters.totalGeneratedEnergy = (node.getResponseBuffer(0x02) | node.getResponseBuffer(0x03) << 16) / 100.0f;
+    DebugPrint("Total generated energy: ");
+    DebugPrintln(statisticalParameters.totalGeneratedEnergy);
+
+    statisticalParameters.CO2reduction = (node.getResponseBuffer(0x04) | node.getResponseBuffer(0x05) << 16) / 100.0f;
+    DebugPrint("Carbon dioxide reduction: ");
+    DebugPrintln(statisticalParameters.CO2reduction);
+  }
+  else
+  {
+    rs485DataReceived = false;
+    DebugPrintln("Read register 0x3310 failed!");
+  }
+}
+
 void AddressRegistry_331B()
 {
-  result = node.readInputRegisters(0x331B, 2);
+  result = node.readInputRegisters(0x331B, 4);
 
   if (result == node.ku8MBSuccess)
   {
     statisticalParameters.batteryCurrent = (node.getResponseBuffer(0x00) | node.getResponseBuffer(0x01) << 16) / 100.0f;
     DebugPrint("Battery Discharge Current: ");
     DebugPrintln(statisticalParameters.batteryCurrent);
+
+    statisticalParameters.batteryTemp = node.getResponseBuffer(0x02) / 100.0f;
+    DebugPrint("Battery Temperature: ");
+    DebugPrintln(statisticalParameters.batteryTemp);
+
+    statisticalParameters.ambientTemp = node.getResponseBuffer(0x03) / 100.0f;
+    DebugPrint("Ambient Temperature: ");
+    DebugPrintln(statisticalParameters.ambientTemp);
   }
   else
   {

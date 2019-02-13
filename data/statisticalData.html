@@ -14,7 +14,22 @@
         if (this.readyState == 4 && this.status == 200) {
           console.log("updateStatisticalData(): got Data:", this.responseText);
           var data = JSON.parse(this.responseText);
-          document.getElementById("todayMaxPvVoltage").innerHTML = data.pvVoltage.toFixed(2) + " V";
+          document.getElementById("todayMaxPvVoltage").innerHTML = data.todayMaxPvVoltage.toFixed(2) + " V";
+          document.getElementById("todayMinPvVoltage").innerHTML = data.todayMinPvVoltage.toFixed(2) + " V";
+          document.getElementById("todayMaxBattVoltage").innerHTML = data.todayMaxBattVoltage.toFixed(2) + " V";
+          document.getElementById("todayMinBattVoltage").innerHTML = data.todayMinBattVoltage.toFixed(2) + " V";
+          document.getElementById("todayConsumedEnergy").innerHTML = data.todayConsumedEnergy.toFixed(2) + " KWH";
+          document.getElementById("monthConsumedEnergy").innerHTML = data.monthConsumedEnergy.toFixed(2) + " KWH";
+          document.getElementById("yearConsumedEnergy").innerHTML = data.yearConsumedEnergy.toFixed(2) + " KWH";
+          document.getElementById("totalConsumedEnergy").innerHTML = data.totalConsumedEnergy.toFixed(2) + " KWH";
+          document.getElementById("todayGeneratedEnergy").innerHTML = data.todayGeneratedEnergy.toFixed(2) + " KWH";
+          document.getElementById("monthGeneratedEnergy").innerHTML = data.monthGeneratedEnergy.toFixed(2) + " KWH";
+          document.getElementById("yearGeneratedEnergy").innerHTML = data.yearGeneratedEnergy.toFixed(2) + " KWH";
+          document.getElementById("totalGeneratedEnergy").innerHTML = data.totalGeneratedEnergy.toFixed(2) + " KWH";
+          document.getElementById("CO2reduction").innerHTML = data.CO2reduction.toFixed(2) + " Ton";
+          document.getElementById("batteryCurrent").innerHTML = data.batteryCurrent.toFixed(2) + " A";
+          document.getElementById("batteryTemp").innerHTML = data.batteryTemp.toFixed(2) + " &deg;C";
+          document.getElementById("ambientTemp").innerHTML = data.ambientTemp.toFixed(2) + " &deg;C";
         }
       };
       xhttp.open("GET", "/getStatisticalData", true);
@@ -37,15 +52,75 @@
 
 <body>
   <h1>ESP8266 Tracer Dashboard</h1>
-  <table class='data-table'>
-    <tr>
-      <th width="200px">Statistical Data</th>
+  <table>
+    <tr id="statisticalData">
+      <th width="270px">Statistical Data</th>
       <th width="100px">Value</th>
     </tr>
     <tr>
-      <td>PV Voltage</td>
+      <td>Maximum PV today</td>
       <td id="todayMaxPvVoltage"></td>
-    </tr>    
+    </tr>
+    <tr>
+      <td>Minimum PV today</td>
+      <td id="todayMinPvVoltage"></td>
+    </tr>
+    <tr>
+      <td>Maximum Battery today</td>
+      <td id="todayMaxBattVoltage"></td>
+    </tr>
+    <tr>
+      <td>Minimum Battery today</td>
+      <td id="todayMinBattVoltage"></td>
+    </tr>
+    <tr>
+      <td>Consumed energy today</td>
+      <td id="todayConsumedEnergy"></td>
+    </tr>
+    <tr>
+      <td>Consumed energy this month</td>
+      <td id="monthConsumedEnergy"></td>
+    </tr>
+    <tr>
+      <td>Consumed energy this year</td>
+      <td id="yearConsumedEnergy"></td>
+    </tr>
+    <tr>
+      <td>Total consumed energy</td>
+      <td id="totalConsumedEnergy"></td>
+    </tr>
+    <tr>
+      <td>Generated energy today</td>
+      <td id="todayGeneratedEnergy"></td>
+    </tr>
+    <tr>
+      <td>Generated energy this month</td>
+      <td id="monthGeneratedEnergy"></td>
+    </tr>
+    <tr>
+      <td>Generated energy this year</td>
+      <td id="yearGeneratedEnergy"></td>
+    </tr>
+    <tr>
+      <td>Total generated energy</td>
+      <td id="totalGeneratedEnergy"></td>
+    </tr>
+    <tr>
+      <td>Carbon dioxide reduction</td>
+      <td id="CO2reduction"></td>
+    </tr>
+    <tr>
+      <td>Battery Current</td>
+      <td id="batteryCurrent"></td>
+    </tr>
+    <tr>
+      <td>Battery Temperature</td>
+      <td id="batteryTemp"></td>
+    </tr>
+    <tr>
+      <td>Ambient Temperature</td>
+      <td id="ambientTemp"></td>
+    </tr>      
 
   </table>
 

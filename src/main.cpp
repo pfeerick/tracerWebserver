@@ -729,7 +729,7 @@ void AddressRegistry_3200()
     DebugPrintln(realtimeStatus.chargeEquipmentStatus);
 
     realtimeStatus.dischargeEquipmentStatus = node.getResponseBuffer(0x02);
-    DebugPrint("Charge Equipment Status: ");
+    DebugPrint("Discharge Equipment Status: ");
     DebugPrintln(realtimeStatus.dischargeEquipmentStatus);
   }
   else

@@ -56,8 +56,9 @@ struct realtime_data
 //realtime status
 struct realtime_status
 {
-  byte batteryStatus;
-  byte equpimentStatus;
+  uint16_t batteryStatus;
+  uint16_t chargeEquipmentStatus;
+  uint16_t dischargeEquipmentStatus;
 } realtimeStatus;
 
 //statistical parameters
@@ -160,6 +161,7 @@ Timer timer;
 //web server json responders
 void getRatedData();
 void getRealtimeData();
+void getRealtimeStatus();
 void getStatisticalData();
 
 // tracer requires no handshaking
@@ -182,6 +184,8 @@ void AddressRegistry_3110();
 void AddressRegistry_311A();
 void AddressRegistry_311D();
 
+void AddressRegistry_3200();
+
 void AddressRegistry_3300();
 void AddressRegistry_3310();
 void AddressRegistry_330A();
@@ -197,6 +201,7 @@ RegistryList Registries = {
     AddressRegistry_3110,
     AddressRegistry_311A,
     AddressRegistry_311D,
+    AddressRegistry_3200,
     AddressRegistry_3300,
     AddressRegistry_330A,
     AddressRegistry_3310,
@@ -321,6 +326,7 @@ void setup()
   server.serveStatic("/", SPIFFS, "/realtimeData.html");
   server.on("/getRatedData", getRatedData);
   server.on("/getRealtimeData", getRealtimeData);
+  server.on("/getRealtimeStatus", getRealtimeStatus);
   server.on("/getStatisticalData", getStatisticalData);
 
   server.begin(); // Actually start the server
@@ -379,6 +385,14 @@ void getRealtimeData()
                   ", \"batterySoC\":" + String(realtimeData.batterySoC) +
                   ", \"batteryRemoteTemp\":" + String(realtimeData.batteryRemoteTemp) +
                   ", \"batteryRatedPower\":" + String(realtimeData.batteryRatedPower) + "}");
+}
+
+void getRealtimeStatus()
+{
+  server.send(200, "application/json",
+              "{\"batteryStatus\":" + String(realtimeStatus.batteryStatus) +
+                  ", \"chargeEquipmentStatus\":" + String(realtimeStatus.chargeEquipmentStatus) +
+                  ", \"dischargeEquipmentStatus\":" + String(realtimeStatus.dischargeEquipmentStatus) + "}");
 }
 
 void getStatisticalData()
@@ -697,6 +711,31 @@ void AddressRegistry_311D()
   {
     rs485DataReceived = false;
     DebugPrintln("Read register 0x311D failed!");
+  }
+}
+
+void AddressRegistry_3200()
+{
+  result = node.readInputRegisters(0x3200, 3);
+
+  if (result == node.ku8MBSuccess)
+  {
+    realtimeStatus.batteryStatus = node.getResponseBuffer(0x00);
+    DebugPrint("Battery Status: ");
+    DebugPrintln(realtimeStatus.batteryStatus);
+
+    realtimeStatus.chargeEquipmentStatus = node.getResponseBuffer(0x01);
+    DebugPrint("Charge Equipment Status: ");
+    DebugPrintln(realtimeStatus.chargeEquipmentStatus);
+
+    realtimeStatus.dischargeEquipmentStatus = node.getResponseBuffer(0x02);
+    DebugPrint("Charge Equipment Status: ");
+    DebugPrintln(realtimeStatus.dischargeEquipmentStatus);
+  }
+  else
+  {
+    rs485DataReceived = false;
+    DebugPrintln("Read register 0x3200 failed!");
   }
 }
 

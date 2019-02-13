@@ -5,8 +5,18 @@ html {
   margin: 0px auto;
 } 
 
-th {
-  background-color: #000080;
+#realtimeData {
+  background-color: rgb(0, 0, 80);
+  color: white;
+}
+
+#ratedData {
+  background-color: rgb(76, 175, 80);
+  color: white;
+}
+
+#statisticalData {
+  background-color: rgb(175, 76, 76);
   color: white;
 }
 

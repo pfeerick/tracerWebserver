@@ -312,7 +312,7 @@ void setup()
       server.send(404, "text/plain", "404: Not Found"); // otherwise, respond with a 404 (Not Found) error
   });
 
-  server.serveStatic("/", SPIFFS, "/index.html");
+  server.serveStatic("/", SPIFFS, "/realtimeData.html");
   server.on("/getRatedData", getRatedData);
   server.on("/getRealtimeData", getRealtimeData);
   server.on("/getStatisticalData", getStatisticalData);

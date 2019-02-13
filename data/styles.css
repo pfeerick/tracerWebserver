@@ -6,17 +6,17 @@ html {
 } 
 
 #realtimeData {
-  background-color: rgb(0, 0, 80);
+  background-color: navy;
   color: white;
 }
 
 #ratedData {
-  background-color: rgb(76, 175, 80);
+  background-color:green;
   color: white;
 }
 
 #statisticalData {
-  background-color: rgb(175, 76, 76);
+  background-color: maroon;
   color: white;
 }
 

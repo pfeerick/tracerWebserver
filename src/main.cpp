@@ -536,6 +536,11 @@ void AddressRegistry_3100()
     DebugPrint("Battery Charge Power: ");
     DebugPrintln(realtimeData.batteryChargingPower);
   }
+  else
+  {
+    rs485DataReceived = false;
+    DebugPrintln("Read register 0x3100 failed!");
+  }
 }
 
 void AddressRegistry_310C()
@@ -559,7 +564,7 @@ void AddressRegistry_310C()
   else
   {
     rs485DataReceived = false;
-    DebugPrintln("Read register 0x310D failed!");
+    DebugPrintln("Read register 0x310C failed!");
   }
 }
 
@@ -581,6 +586,11 @@ void AddressRegistry_3110()
     DebugPrint("Heatsink Temp: ");
     DebugPrintln(realtimeData.heatsinkTemp);
   }
+  else
+  {
+    rs485DataReceived = false;
+    DebugPrintln("Read register 0x3110 failed!");
+  }  
 }
 
 void AddressRegistry_311A()

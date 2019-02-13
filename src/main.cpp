@@ -29,7 +29,7 @@ struct rated_data
   float batteryVoltage;
   float batteryCurrent;
   int16_t batteryPower;
-  float chargingMode; //0000H Connect/disconnect, 0001H PWM, 0002H MPPT
+  uint8_t chargingMode; //0000H Connect/disconnect, 0001H PWM, 0002H MPPT
   float loadCurrent;
 } ratedData;
 
@@ -173,6 +173,9 @@ uint8_t setOutputLoadPower(uint8_t state);
 void executeCurrentRegistryFunction();
 void nextRegistryNumber();
 
+void AddressRegistry_3000();
+void AddressRegistry_300E();
+
 void AddressRegistry_3100();
 void AddressRegistry_310C();
 void AddressRegistry_3110();
@@ -184,6 +187,8 @@ void AddressRegistry_331B();
 // a list of the regisities to query in order
 typedef void (*RegistryList[])();
 RegistryList Registries = {
+    AddressRegistry_3000,
+    AddressRegistry_300E,
     AddressRegistry_3100,
     AddressRegistry_310C,
     AddressRegistry_3110,
@@ -506,6 +511,64 @@ void nextRegistryNumber()
   }
 }
 
+void AddressRegistry_3000()
+{
+  result = node.readInputRegisters(0x3000, 9);
+
+  if (result == node.ku8MBSuccess)
+  {
+    ratedData.pvVoltage = node.getResponseBuffer(0x00) / 100.0f;
+    DebugPrint("PV Voltage: ");
+    DebugPrintln(ratedData.pvVoltage);
+
+    ratedData.pvCurrent = node.getResponseBuffer(0x01) / 100.0f;
+    DebugPrint("PV Current: ");
+    DebugPrintln(ratedData.pvCurrent);
+
+    ratedData.pvPower = (node.getResponseBuffer(0x02) | node.getResponseBuffer(0x03) << 16) / 100.0f;
+    DebugPrint("PV Power: ");
+    DebugPrintln(ratedData.pvPower);
+
+    ratedData.batteryVoltage = node.getResponseBuffer(0x04) / 100.0f;
+    DebugPrint("Battery Voltage: ");
+    DebugPrintln(ratedData.batteryVoltage);
+
+    ratedData.batteryCurrent = node.getResponseBuffer(0x05) / 100.0f;
+    DebugPrint("Battery Current: ");
+    DebugPrintln(ratedData.batteryCurrent);
+
+    ratedData.batteryPower = (node.getResponseBuffer(0x06) | node.getResponseBuffer(0x07) << 16) / 100.0f;
+    DebugPrint("Battery Power: ");
+    DebugPrintln(ratedData.batteryPower);
+
+    ratedData.chargingMode = node.getResponseBuffer(0x08);
+    DebugPrint("Charging mode: ");
+    DebugPrintln(ratedData.chargingMode);
+  }
+  else
+  {
+    rs485DataReceived = false;
+    DebugPrintln("Read register 0x3000 failed!");
+  }
+}
+
+void AddressRegistry_300E()
+{
+  result = node.readInputRegisters(0x300E, 1);
+
+  if (result == node.ku8MBSuccess)
+  {
+    ratedData.loadCurrent = node.getResponseBuffer(0x00) / 100.0f;
+    DebugPrint("Load Current: ");
+    DebugPrintln(ratedData.loadCurrent);
+  }
+  else
+  {
+    rs485DataReceived = false;
+    DebugPrintln("Read register 0x311D failed!");
+  }
+}
+
 void AddressRegistry_3100()
 {
   result = node.readInputRegisters(0x3100, 8);
@@ -590,7 +653,7 @@ void AddressRegistry_3110()
   {
     rs485DataReceived = false;
     DebugPrintln("Read register 0x3110 failed!");
-  }  
+  }
 }
 
 void AddressRegistry_311A()

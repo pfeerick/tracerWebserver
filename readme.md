@@ -10,6 +10,7 @@ You can see the JSON data responses if you naviate to any of the following URLs:
   /getRealtimeStatus
   /getStatisticalData
   /getDiscrete
+  /getCoils
 ```
 
 ![screenshot of realtime_data page](realtime_data.png)

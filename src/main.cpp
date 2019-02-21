@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#define DEBUG
+// #define DEBUG
 #define DEBUG_OI Serial
 #include "debug.h"
 

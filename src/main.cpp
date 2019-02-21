@@ -36,6 +36,9 @@ void AddressRegistry_3310();
 void AddressRegistry_330A();
 void AddressRegistry_331B();
 
+void discrete_2000();
+void discrete_200C();
+
 ModbusMaster node;
 uint8_t result;
 
@@ -182,6 +185,7 @@ void getRealtimeData();
 void getRealtimeStatus();
 void getStatisticalData();
 void getCoils();
+void getDiscrete();
 
 // tracer requires no handshaking
 void preTransmission() {}
@@ -210,8 +214,10 @@ RegistryList Registries = {
     AddressRegistry_3310,
     AddressRegistry_331B,
     readManualCoil,
-    readLoadTestAndForceLoadCoil
-};
+    readLoadTestAndForceLoadCoil, 
+    discrete_2000,
+    discrete_200C
+    };
 // keep log of where we are
 uint8_t currentRegistryNumber = 0;
 
@@ -333,7 +339,8 @@ void setup()
   server.on("/getRealtimeData", getRealtimeData);
   server.on("/getRealtimeStatus", getRealtimeStatus);
   server.on("/getStatisticalData", getStatisticalData);
-  server.on("/getCoils", getCoils);  
+  server.on("/getCoils", getCoils);
+  server.on("/getDiscrete",getDiscrete);
 
   server.begin(); // Actually start the server
   DebugPrintln("HTTP server started");
@@ -427,7 +434,13 @@ void getCoils()
               "{\"manualControl\":" + String(switchValues.manualControl) +
                   ", \"loadTest\":" + String(switchValues.loadTest) +
                   ", \"forceLoad\":" + String(switchValues.forceLoad) + "}");
+}
 
+void getDiscrete()
+{
+  server.send(200, "application/json",
+              "{\"overTemp\":" + String(discreteInput.overTemp) +
+                  ", \"dayNight\":" + String(discreteInput.dayNight) + "}");
 }
 
 String getContentType(String filename)
@@ -472,7 +485,7 @@ void readManualCoil()
   {
     switchValues.manualControl = (node.getResponseBuffer(0x00) > 0);
 
-    DebugPrint("0x02 State: ");
+    DebugPrint("Manual Load Control State: ");
     DebugPrintln(switchValues.manualControl);
   }
   else
@@ -486,17 +499,16 @@ void readLoadTestAndForceLoadCoil()
 {
   DebugPrint("Reading coil 0x05 & 0x06... ");
 
-  delay(10);
   result = node.readCoils(0x0005, 2);
 
   if (result == node.ku8MBSuccess)
   {
     switchValues.loadTest = (node.getResponseBuffer(0x00) > 0);
-    DebugPrint("0x05 State: ");
+    DebugPrint("Enable Load Test Mode: ");
     DebugPrintln(switchValues.loadTest);
 
     switchValues.forceLoad = (node.getResponseBuffer(0x01) > 0);
-    DebugPrint("Ox06 State: ");
+    DebugPrint("Force Load On/Off: ");
     DebugPrintln(switchValues.forceLoad);
   }
   else
@@ -510,7 +522,6 @@ uint8_t setOutputLoadPower(uint8_t state)
   DebugPrint("Writing coil 0x0006 value to: ");
   DebugPrintln(state);
 
-  delay(10);
   // Set coil at address 0x0006 (Force the load on/off)
   result = node.writeSingleCoil(0x0006, state);
 
@@ -521,6 +532,44 @@ uint8_t setOutputLoadPower(uint8_t state)
   }
 
   return result;
+}
+
+void discrete_2000()
+{
+  DebugPrint("Reading discrete input 0x2000... ");
+
+  result = node.readDiscreteInputs(0x2000, 1);
+
+  if (result == node.ku8MBSuccess)
+  {
+    discreteInput.overTemp = node.getResponseBuffer(0x00);
+
+    DebugPrint("Over temperature inside device (1) or Normal (0): ");
+    DebugPrintln(discreteInput.overTemp);
+  }
+  else
+  {
+    DebugPrintln("Failed to read discrete input 0x2000!");
+  }
+}
+
+void discrete_200C()
+{
+  DebugPrint("Reading discrete input 0x200C... ");
+
+  result = node.readDiscreteInputs(0x200C, 1);
+
+  if (result == node.ku8MBSuccess)
+  {
+    discreteInput.overTemp = node.getResponseBuffer(0x00);
+
+    DebugPrint("Day (0) or Night (1): ");
+    DebugPrintln(discreteInput.dayNight);
+  }
+  else
+  {
+    DebugPrintln("Failed to read discrete input 0x200C!");
+  }  
 }
 
 void executeCurrentRegistryFunction()

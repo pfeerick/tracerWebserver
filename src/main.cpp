@@ -338,6 +338,7 @@ void setup()
   server.on("/getRealtimeData", getRealtimeData);
   server.on("/getRealtimeStatus", getRealtimeStatus);
   server.on("/getStatisticalData", getStatisticalData);
+  server.on("/getCoils", getCoils);
   server.on("/getDiscrete", getDiscrete);
 
   server.begin(); // Actually start the server
@@ -475,8 +476,8 @@ bool handleFileRead(String path)
 void readManualCoil()
 {
   DebugPrint("Reading coil 0x02... ");
-
   delay(10);
+
   result = node.readCoils(0x0002, 1);
 
   if (result == node.ku8MBSuccess)
@@ -496,6 +497,7 @@ void readManualCoil()
 void readLoadTestAndForceLoadCoil()
 {
   DebugPrint("Reading coil 0x05 & 0x06... ");
+  delay(10);
 
   result = node.readCoils(0x0005, 2);
 

@@ -6,12 +6,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <link rel="stylesheet" href="styles.css">
+
+    <script>
+        function updateSummaryData() {
+            console.log("updateSummaryData()");
+            var realtime = new XMLHttpRequest();
+            var coils = new XMLHttpRequest();
+            var discrete = new XMLHttpRequest();
+
+            realtime.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log("updateSummaryData(): got Data:", this.responseText);
+                    var data = JSON.parse(this.responseText);
+                    document.getElementById("pvVoltage").innerHTML = data.pvVoltage.toFixed(2) + " V";
+                    document.getElementById("pvCurrent").innerHTML = data.pvCurrent.toFixed(2) + " A";
+                    //   document.getElementById("pvPower").innerHTML = data.pvPower.toFixed(0) + " W";
+                    document.getElementById("batteryVoltage").innerHTML = data.batteryVoltage.toFixed(2) + " V";
+                    document.getElementById("batteryChargingCurrent").innerHTML = data.batteryChargingCurrent.toFixed(2) + " A";
+                    //   document.getElementById("batteryChargingPower").innerHTML = data.batteryChargingPower.toFixed(0) + " W";
+                    document.getElementById("batterySoC").innerHTML = "Batt (" + data.batterySoC.toFixed(0) + "%)";
+                    document.getElementById("loadVoltage").innerHTML = data.loadVoltage.toFixed(2) + " V";
+                    document.getElementById("loadCurrent").innerHTML = data.loadCurrent.toFixed(2) + " A";
+                    //   document.getElementById("loadPower").innerHTML = data.loadPower.toFixed(0) + " W";
+                }
+            };
+            realtime.open("GET", "/getRealtimeData", true);
+            realtime.send();
+
+            coils.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log("updateSummaryData(): got Data:", this.responseText);
+                    var data = JSON.parse(this.responseText);
+                    document.getElementById("manualControl").innerHTML = "Load (" + data.manualControl.toFixed(0) + ")";
+                }
+            };
+            coils.open("GET", "/getCoils", true);
+            coils.send();
+
+            discrete.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log("updateSummaryData(): got Data:", this.responseText);
+                    var data = JSON.parse(this.responseText);
+                    document.getElementById("dayNight").innerHTML = "PV (" + data.dayNight.toFixed(0) + ")";
+                }
+            };
+            discrete.open("GET", "/getDiscrete", true);
+            discrete.send();
+        }
+
+        function toggleAutoRefresh(cb) {
+            if (cb.checked) {
+                refreshData = window.setInterval(updateSummaryData, 5000);
+            } else {
+                clearTimeout(refreshData);
+            }
+        }
+
+        updateSummaryData();
+
+        refreshData = window.setInterval(updateSummaryData, 5000); //update the sensordata 5 seconds
+    </script>
 </head>
 
 <body>
     <h1>ESP8266 Tracer Dashboard</h1>
 
-    <p>A nice dashboard may go here at some point, that mimics the MT50 display plus other bits, but for now...</p>
+    <br /> <br />
+
+    <table>
+        <tr>
+            <td id="dayNight">PV</td>
+            <td id="batterySoC">Batt</td>
+            <td id="manualControl">Load</td>
+        </tr>
+        <tr>
+            <td id="pvVoltage"></td>
+            <td id="batteryVoltage"></td>
+            <td id="loadVoltage"></td>
+        </tr>
+        <tr>
+            <td id="pvCurrent"></td>
+            <td id="batteryChargingCurrent"></td>
+            <td id="loadCurrent"></td>
+        </tr>
+    </table>
+
+    <input type="checkbox" onclick="toggleAutoRefresh(this);" id="reloadCB" checked> Auto Refresh
+
+    <br /><br /><br />
 
     <a href="ratedData.html">Rated Data</a><br />
     <a href="realtimeData.html">Realtime Data</a><br />

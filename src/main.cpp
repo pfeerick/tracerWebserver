@@ -4,7 +4,6 @@
 #define DEBUG_OI Serial
 #include "debug.h"
 
-#include <ModbusMaster.h> //https://github.com/4-20ma/ModbusMaster
 #include <Timer.h>        //https://github.com/JChristensen/Timer
 #include <ESP8266WiFi.h>  //https://github.com/esp8266/Arduino
 #include <DNSServer.h>
@@ -18,9 +17,29 @@
 #define LED_PIN D4 //GPIO2
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
+#include <ModbusMaster.h> //https://github.com/4-20ma/ModbusMaster
+#include "debug.h"
+
+void AddressRegistry_3000();
+void AddressRegistry_300E();
+
+void AddressRegistry_3100();
+void AddressRegistry_310C();
+void AddressRegistry_3110();
+void AddressRegistry_311A();
+void AddressRegistry_311D();
+
+void AddressRegistry_3200();
+
+void AddressRegistry_3300();
+void AddressRegistry_3310();
+void AddressRegistry_330A();
+void AddressRegistry_331B();
+
+ModbusMaster node;
 uint8_t result;
 
-//rated data
+//rated data - input register (16 bit word readonly)
 struct rated_data
 {
   float pvVoltage;
@@ -33,7 +52,7 @@ struct rated_data
   float loadCurrent;
 } ratedData;
 
-//realtime data
+//realtime data - input register (16 bit word readonly)
 struct realtime_data
 {
   float pvVoltage;
@@ -53,7 +72,7 @@ struct realtime_data
   uint16_t batteryRatedPower; //1200,2400 for 12/12v
 } realtimeData;
 
-//realtime status
+//realtime status - input register (16 bit word readonly)
 struct realtime_status
 {
   uint16_t batteryStatus;
@@ -61,7 +80,7 @@ struct realtime_status
   uint16_t dischargeEquipmentStatus;
 } realtimeStatus;
 
-//statistical parameters
+//statistical parameters - input register (16 bit word readonly)
 struct statistical_parameters
 {
   float todayMaxPvVoltage;
@@ -82,7 +101,7 @@ struct statistical_parameters
   float ambientTemp;
 } statisticalParameters;
 
-//setting_parameters
+//setting_parameters - holding register (16 bit word read-write)
 struct setting_parameters
 {
   float batteryType;
@@ -137,7 +156,7 @@ struct setting_parameters
   bool batteryManagementMode;        //0=voltComp, 1=SoC
 } settingParameters;
 
-//coil / switch values
+//coil / switch values - coils (single bit read-write)
 struct switch_value
 {
   bool manualControl;
@@ -145,7 +164,7 @@ struct switch_value
   bool forceLoad;
 } switchValues;
 
-//discrete_input
+//discrete_input - discretes input (single bit readonly)
 struct discrete_input
 {
   bool overTemp;
@@ -155,7 +174,7 @@ struct discrete_input
 bool rs485DataReceived = true;
 bool loadPoweredOn = true;
 
-ModbusMaster node;
+
 Timer timer;
 
 //web server json responders
@@ -174,22 +193,6 @@ uint8_t setOutputLoadPower(uint8_t state);
 
 void executeCurrentRegistryFunction();
 void nextRegistryNumber();
-
-void AddressRegistry_3000();
-void AddressRegistry_300E();
-
-void AddressRegistry_3100();
-void AddressRegistry_310C();
-void AddressRegistry_3110();
-void AddressRegistry_311A();
-void AddressRegistry_311D();
-
-void AddressRegistry_3200();
-
-void AddressRegistry_3300();
-void AddressRegistry_3310();
-void AddressRegistry_330A();
-void AddressRegistry_331B();
 
 // a list of the regisities to query in order
 typedef void (*RegistryList[])();

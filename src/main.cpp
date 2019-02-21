@@ -195,8 +195,7 @@ void readManualCoil();
 void readLoadTestAndForceLoadCoil();
 uint8_t setOutputLoadPower(uint8_t state);
 
-void executeCurrentRegistryFunction();
-void nextRegistryNumber();
+void updateNextRegistryEntry();
 
 // a list of the regisities to query in order
 typedef void (*RegistryList[])();
@@ -345,8 +344,7 @@ void setup()
   DebugPrintln("HTTP server started");
 
   DebugPrintln("Starting timed actions...");
-  timer.every(500L, executeCurrentRegistryFunction);
-  timer.every(500L, nextRegistryNumber);
+  timer.every(600L, updateNextRegistryEntry);
 
   DebugPrintln("Setup OK!");
   DebugPrintln("----------------------------");
@@ -534,20 +532,16 @@ uint8_t setOutputLoadPower(uint8_t state)
   return result;
 }
 
-void executeCurrentRegistryFunction()
+void updateNextRegistryEntry()
 {
   Registries[currentRegistryNumber]();
-}
 
-// function to switch to next registry
-void nextRegistryNumber()
-{
   // better not use modulo, because after overlow it will start reading in incorrect order
   currentRegistryNumber++;
   if (currentRegistryNumber >= ARRAY_SIZE(Registries))
   {
     currentRegistryNumber = 0;
-  }
+  }  
 }
 
 void AddressRegistry_2000()

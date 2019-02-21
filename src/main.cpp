@@ -20,6 +20,9 @@
 #include <ModbusMaster.h> //https://github.com/4-20ma/ModbusMaster
 #include "debug.h"
 
+void AddressRegistry_2000();
+void AddressRegistry_200C();
+
 void AddressRegistry_3000();
 void AddressRegistry_300E();
 
@@ -35,9 +38,6 @@ void AddressRegistry_3300();
 void AddressRegistry_3310();
 void AddressRegistry_330A();
 void AddressRegistry_331B();
-
-void discrete_2000();
-void discrete_200C();
 
 ModbusMaster node;
 uint8_t result;
@@ -184,12 +184,8 @@ void getRatedData();
 void getRealtimeData();
 void getRealtimeStatus();
 void getStatisticalData();
-<<<<<<< HEAD
 void getCoils();
 void getDiscrete();
-=======
-void getDiscreteInput();
->>>>>>> b602463193b948534e591125198ada9b2a54103e
 
 // tracer requires no handshaking
 void preTransmission() {}
@@ -202,28 +198,6 @@ uint8_t setOutputLoadPower(uint8_t state);
 void executeCurrentRegistryFunction();
 void nextRegistryNumber();
 
-<<<<<<< HEAD
-=======
-void AddressRegistry_2000();
-void AddressRegistry_200C();
-
-void AddressRegistry_3000();
-void AddressRegistry_300E();
-
-void AddressRegistry_3100();
-void AddressRegistry_310C();
-void AddressRegistry_3110();
-void AddressRegistry_311A();
-void AddressRegistry_311D();
-
-void AddressRegistry_3200();
-
-void AddressRegistry_3300();
-void AddressRegistry_3310();
-void AddressRegistry_330A();
-void AddressRegistry_331B();
-
->>>>>>> b602463193b948534e591125198ada9b2a54103e
 // a list of the regisities to query in order
 typedef void (*RegistryList[])();
 RegistryList Registries = {
@@ -242,10 +216,7 @@ RegistryList Registries = {
     AddressRegistry_3310,
     AddressRegistry_331B,
     readManualCoil,
-    readLoadTestAndForceLoadCoil, 
-    discrete_2000,
-    discrete_200C
-    };
+    readLoadTestAndForceLoadCoil};
 // keep log of where we are
 uint8_t currentRegistryNumber = 0;
 
@@ -367,12 +338,7 @@ void setup()
   server.on("/getRealtimeData", getRealtimeData);
   server.on("/getRealtimeStatus", getRealtimeStatus);
   server.on("/getStatisticalData", getStatisticalData);
-<<<<<<< HEAD
-  server.on("/getCoils", getCoils);
-  server.on("/getDiscrete",getDiscrete);
-=======
-  server.on("/getDiscreteInput", getDiscreteInput);
->>>>>>> b602463193b948534e591125198ada9b2a54103e
+  server.on("/getDiscrete", getDiscrete);
 
   server.begin(); // Actually start the server
   DebugPrintln("HTTP server started");
@@ -460,7 +426,6 @@ void getStatisticalData()
                   ", \"ambientTemp\":" + String(statisticalParameters.ambientTemp) + "}");
 }
 
-<<<<<<< HEAD
 void getCoils()
 {
   server.send(200, "application/json",
@@ -470,9 +435,6 @@ void getCoils()
 }
 
 void getDiscrete()
-=======
-void getDiscreteInput()
->>>>>>> b602463193b948534e591125198ada9b2a54103e
 {
   server.send(200, "application/json",
               "{\"overTemp\":" + String(discreteInput.overTemp) +
@@ -570,44 +532,6 @@ uint8_t setOutputLoadPower(uint8_t state)
   return result;
 }
 
-void discrete_2000()
-{
-  DebugPrint("Reading discrete input 0x2000... ");
-
-  result = node.readDiscreteInputs(0x2000, 1);
-
-  if (result == node.ku8MBSuccess)
-  {
-    discreteInput.overTemp = node.getResponseBuffer(0x00);
-
-    DebugPrint("Over temperature inside device (1) or Normal (0): ");
-    DebugPrintln(discreteInput.overTemp);
-  }
-  else
-  {
-    DebugPrintln("Failed to read discrete input 0x2000!");
-  }
-}
-
-void discrete_200C()
-{
-  DebugPrint("Reading discrete input 0x200C... ");
-
-  result = node.readDiscreteInputs(0x200C, 1);
-
-  if (result == node.ku8MBSuccess)
-  {
-    discreteInput.overTemp = node.getResponseBuffer(0x00);
-
-    DebugPrint("Day (0) or Night (1): ");
-    DebugPrintln(discreteInput.dayNight);
-  }
-  else
-  {
-    DebugPrintln("Failed to read discrete input 0x200C!");
-  }  
-}
-
 void executeCurrentRegistryFunction()
 {
   Registries[currentRegistryNumber]();
@@ -631,7 +555,7 @@ void AddressRegistry_2000()
   if (result == node.ku8MBSuccess)
   {
     discreteInput.overTemp = node.getResponseBuffer(0x00);
-    DebugPrint("Over temperature inside device: ");
+    DebugPrint("Over temperature inside device (1) or Normal (0): ");
     DebugPrintln(discreteInput.overTemp);
   }
   else
@@ -648,7 +572,7 @@ void AddressRegistry_200C()
   if (result == node.ku8MBSuccess)
   {
     discreteInput.dayNight = node.getResponseBuffer(0x00);
-    DebugPrint("Day/Night: ");
+    DebugPrint("Day (0) or Night (1): ");
     DebugPrintln(discreteInput.dayNight);
   }
   else

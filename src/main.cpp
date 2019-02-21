@@ -1,11 +1,11 @@
 #include <Arduino.h>
 
-//#define DEBUG
+#define DEBUG
 #define DEBUG_OI Serial
 #include "debug.h"
 
-#include <Timer.h>        //https://github.com/JChristensen/Timer
-#include <ESP8266WiFi.h>  //https://github.com/esp8266/Arduino
+#include <Timer.h>       //https://github.com/JChristensen/Timer
+#include <ESP8266WiFi.h> //https://github.com/esp8266/Arduino
 #include <DNSServer.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266WebServer.h>
@@ -174,7 +174,6 @@ struct discrete_input
 bool rs485DataReceived = true;
 bool loadPoweredOn = true;
 
-
 Timer timer;
 
 //web server json responders
@@ -182,13 +181,14 @@ void getRatedData();
 void getRealtimeData();
 void getRealtimeStatus();
 void getStatisticalData();
+void getCoils();
 
 // tracer requires no handshaking
 void preTransmission() {}
 void postTransmission() {}
 
-uint8_t readOutputLoadState();
-uint8_t checkLoadCoilState();
+void readManualCoil();
+void readLoadTestAndForceLoadCoil();
 uint8_t setOutputLoadPower(uint8_t state);
 
 void executeCurrentRegistryFunction();
@@ -209,6 +209,8 @@ RegistryList Registries = {
     AddressRegistry_330A,
     AddressRegistry_3310,
     AddressRegistry_331B,
+    readManualCoil,
+    readLoadTestAndForceLoadCoil
 };
 // keep log of where we are
 uint8_t currentRegistryNumber = 0;
@@ -331,14 +333,14 @@ void setup()
   server.on("/getRealtimeData", getRealtimeData);
   server.on("/getRealtimeStatus", getRealtimeStatus);
   server.on("/getStatisticalData", getStatisticalData);
+  server.on("/getCoils", getCoils);  
 
   server.begin(); // Actually start the server
   DebugPrintln("HTTP server started");
 
   DebugPrintln("Starting timed actions...");
-  timer.every(1000L, executeCurrentRegistryFunction);
-  timer.every(1000L, nextRegistryNumber);
-  timer.every(5000L, checkLoad);
+  timer.every(500L, executeCurrentRegistryFunction);
+  timer.every(500L, nextRegistryNumber);
 
   DebugPrintln("Setup OK!");
   DebugPrintln("----------------------------");
@@ -419,6 +421,15 @@ void getStatisticalData()
                   ", \"ambientTemp\":" + String(statisticalParameters.ambientTemp) + "}");
 }
 
+void getCoils()
+{
+  server.send(200, "application/json",
+              "{\"manualControl\":" + String(switchValues.manualControl) +
+                  ", \"loadTest\":" + String(switchValues.loadTest) +
+                  ", \"forceLoad\":" + String(switchValues.forceLoad) + "}");
+
+}
+
 String getContentType(String filename)
 { // convert the file extension to the MIME type
   if (filename.endsWith(".html"))
@@ -449,55 +460,49 @@ bool handleFileRead(String path)
   return false; // If the file doesn't exist, return false
 }
 
-void checkLoad()
+// reads manual control state
+void readManualCoil()
 {
-  readOutputLoadState();
-}
+  DebugPrint("Reading coil 0x02... ");
 
-uint8_t readOutputLoadState()
-{
   delay(10);
-  result = node.readHoldingRegisters(0x903D, 1);
+  result = node.readCoils(0x0002, 1);
 
   if (result == node.ku8MBSuccess)
   {
-    loadPoweredOn = (node.getResponseBuffer(0x00) & 0x02) > 0;
+    switchValues.manualControl = (node.getResponseBuffer(0x00) > 0);
 
-    DebugPrint("Set success. Load: ");
-    DebugPrintln(loadPoweredOn);
+    DebugPrint("0x02 State: ");
+    DebugPrintln(switchValues.manualControl);
   }
   else
   {
-    // update of status failed
-    DebugPrintln("readHoldingRegisters(0x903D, 1) failed!");
+    DebugPrintln("Failed to read coil 0x02!");
   }
-  return result;
 }
 
 // reads Load Enable Override coil
-uint8_t checkLoadCoilState()
+void readLoadTestAndForceLoadCoil()
 {
-  DebugPrint("Reading coil 0x0006... ");
+  DebugPrint("Reading coil 0x05 & 0x06... ");
 
   delay(10);
-  result = node.readCoils(0x0006, 1);
-
-  DebugPrint("Result: ");
-  DebugPrintln(result);
+  result = node.readCoils(0x0005, 2);
 
   if (result == node.ku8MBSuccess)
   {
-    loadPoweredOn = (node.getResponseBuffer(0x00) > 0);
+    switchValues.loadTest = (node.getResponseBuffer(0x00) > 0);
+    DebugPrint("0x05 State: ");
+    DebugPrintln(switchValues.loadTest);
 
-    DebugPrint(" Value: ");
-    DebugPrintln(loadPoweredOn);
+    switchValues.forceLoad = (node.getResponseBuffer(0x01) > 0);
+    DebugPrint("Ox06 State: ");
+    DebugPrintln(switchValues.forceLoad);
   }
   else
   {
-    DebugPrintln("Failed to read coil 0x0006!");
+    DebugPrintln("Failed to read coils 0x05 & 0x06!");
   }
-
-  return result;
 }
 
 uint8_t setOutputLoadPower(uint8_t state)

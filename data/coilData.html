@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ESP8266 Tracer Dashboard - Coil Data</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        function updateCoilData() {
+            console.log("updateCoilData()");
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log("updateCoilData(): got Data:", this.responseText);
+                    var data = JSON.parse(this.responseText);
+                    document.getElementById("manualControl").innerHTML = data.manualControl.toFixed(0);
+                    document.getElementById("loadTest").innerHTML = data.loadTest.toFixed(0);
+                    document.getElementById("forceLoad").innerHTML = data.forceLoad.toFixed(0);
+                }
+            };
+            xhttp.open("GET", "/getCoils", true);
+            xhttp.send();
+        }
+
+        function toggleAutoRefresh(cb) {
+            if (cb.checked) {
+                refreshData = window.setInterval(updateCoilData, 5000);
+            } else {
+                clearTimeout(refreshData);
+            }
+        }
+
+        updateCoilData();
+
+        refreshData = window.setInterval(updateCoilData, 5000); //update the sensordata 5 seconds
+    </script>
+</head>
+
+<body>
+    <h1>ESP8266 Tracer Dashboard</h1>
+    <table>
+        <tr id="coilData">
+            <th width="200px">Discrete Data</th>
+            <th width="100px">Value</th>
+        </tr>
+        <tr>
+            <td>Manual load control</td>
+            <td id="manualControl"></td>
+        </tr>
+        <tr>
+            <td>Enable load test</td>
+            <td id="loadTest"></td>
+        </tr>
+        <tr>
+            <td>Force load on/off</td>
+            <td id="forceLoad"></td>
+        </tr>
+    </table>
+    <input type="checkbox" onclick="toggleAutoRefresh(this);" id="reloadCB" checked> Auto Refresh
+</body>
+
+</html>

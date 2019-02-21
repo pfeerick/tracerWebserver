@@ -20,6 +20,16 @@ html {
   color: white;
 }
 
+#discreteData {
+  background-color: orange;
+  color: white;
+}
+
+#coilData {
+  background-color: purple;
+  color: white;
+}
+
 th, td {
   text-align: left;
   padding: 8px;

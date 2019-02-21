@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>ESP8266 Tracer Dashboard - Discrete Data</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    function updateDiscreteData() {
+      console.log("updateDiscreteData()");
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          console.log("updateDiscreteData(): got Data:", this.responseText);
+          var data = JSON.parse(this.responseText);
+          document.getElementById("overTemp").innerHTML = data.overTemp.toFixed(0);
+          document.getElementById("dayNight").innerHTML = data.dayNight.toFixed(0);
+        }
+      };
+      xhttp.open("GET", "/getDiscrete", true);
+      xhttp.send();
+    }
+
+    function toggleAutoRefresh(cb) {
+      if (cb.checked) {
+        refreshData = window.setInterval(updateDiscreteData, 5000);
+      } else {
+        clearTimeout(refreshData);
+      }
+    }
+
+    updateDiscreteData();
+
+    refreshData = window.setInterval(updateDiscreteData, 5000); //update the sensordata 5 seconds
+  </script>
+</head>
+
+<body>
+  <h1>ESP8266 Tracer Dashboard</h1>
+  <table>
+    <tr id="discreteData">
+      <th width="200px">Discrete Data</th>
+      <th width="100px">Value</th>
+    </tr>
+    <tr>
+      <td>Over temperature inside device (1) or Normal (0)</td>
+      <td id="overTemp"></td>
+    </tr>
+    <tr>
+      <td>Day (0) or Night (1)</td>
+      <td id="dayNight"></td>
+    </tr>
+  </table>
+  <input type="checkbox" onclick="toggleAutoRefresh(this);" id="reloadCB" checked> Auto Refresh
+</body>
+
+</html>

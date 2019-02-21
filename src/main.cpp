@@ -184,8 +184,12 @@ void getRatedData();
 void getRealtimeData();
 void getRealtimeStatus();
 void getStatisticalData();
+<<<<<<< HEAD
 void getCoils();
 void getDiscrete();
+=======
+void getDiscreteInput();
+>>>>>>> b602463193b948534e591125198ada9b2a54103e
 
 // tracer requires no handshaking
 void preTransmission() {}
@@ -198,9 +202,33 @@ uint8_t setOutputLoadPower(uint8_t state);
 void executeCurrentRegistryFunction();
 void nextRegistryNumber();
 
+<<<<<<< HEAD
+=======
+void AddressRegistry_2000();
+void AddressRegistry_200C();
+
+void AddressRegistry_3000();
+void AddressRegistry_300E();
+
+void AddressRegistry_3100();
+void AddressRegistry_310C();
+void AddressRegistry_3110();
+void AddressRegistry_311A();
+void AddressRegistry_311D();
+
+void AddressRegistry_3200();
+
+void AddressRegistry_3300();
+void AddressRegistry_3310();
+void AddressRegistry_330A();
+void AddressRegistry_331B();
+
+>>>>>>> b602463193b948534e591125198ada9b2a54103e
 // a list of the regisities to query in order
 typedef void (*RegistryList[])();
 RegistryList Registries = {
+    AddressRegistry_2000,
+    AddressRegistry_200C,
     AddressRegistry_3000,
     AddressRegistry_300E,
     AddressRegistry_3100,
@@ -334,13 +362,17 @@ void setup()
       server.send(404, "text/plain", "404: Not Found"); // otherwise, respond with a 404 (Not Found) error
   });
 
-  server.serveStatic("/", SPIFFS, "/realtimeData.html");
+  server.serveStatic("/", SPIFFS, "/index.html");
   server.on("/getRatedData", getRatedData);
   server.on("/getRealtimeData", getRealtimeData);
   server.on("/getRealtimeStatus", getRealtimeStatus);
   server.on("/getStatisticalData", getStatisticalData);
+<<<<<<< HEAD
   server.on("/getCoils", getCoils);
   server.on("/getDiscrete",getDiscrete);
+=======
+  server.on("/getDiscreteInput", getDiscreteInput);
+>>>>>>> b602463193b948534e591125198ada9b2a54103e
 
   server.begin(); // Actually start the server
   DebugPrintln("HTTP server started");
@@ -428,6 +460,7 @@ void getStatisticalData()
                   ", \"ambientTemp\":" + String(statisticalParameters.ambientTemp) + "}");
 }
 
+<<<<<<< HEAD
 void getCoils()
 {
   server.send(200, "application/json",
@@ -437,6 +470,9 @@ void getCoils()
 }
 
 void getDiscrete()
+=======
+void getDiscreteInput()
+>>>>>>> b602463193b948534e591125198ada9b2a54103e
 {
   server.send(200, "application/json",
               "{\"overTemp\":" + String(discreteInput.overTemp) +
@@ -585,6 +621,40 @@ void nextRegistryNumber()
   if (currentRegistryNumber >= ARRAY_SIZE(Registries))
   {
     currentRegistryNumber = 0;
+  }
+}
+
+void AddressRegistry_2000()
+{
+  result = node.readDiscreteInputs(0x2000, 1);
+
+  if (result == node.ku8MBSuccess)
+  {
+    discreteInput.overTemp = node.getResponseBuffer(0x00);
+    DebugPrint("Over temperature inside device: ");
+    DebugPrintln(discreteInput.overTemp);
+  }
+  else
+  {
+    rs485DataReceived = false;
+    DebugPrintln("Read discrete input 0x2000 failed!");
+  }
+}
+
+void AddressRegistry_200C()
+{
+  result = node.readDiscreteInputs(0x200C, 1);
+
+  if (result == node.ku8MBSuccess)
+  {
+    discreteInput.dayNight = node.getResponseBuffer(0x00);
+    DebugPrint("Day/Night: ");
+    DebugPrintln(discreteInput.dayNight);
+  }
+  else
+  {
+    rs485DataReceived = false;
+    DebugPrintln("Read discrete input 0x200C failed!");
   }
 }
 
@@ -786,7 +856,7 @@ void AddressRegistry_3200()
     DebugPrintln(realtimeStatus.chargeEquipmentStatus);
 
     realtimeStatus.dischargeEquipmentStatus = node.getResponseBuffer(0x02);
-    DebugPrint("Charge Equipment Status: ");
+    DebugPrint("Discharge Equipment Status: ");
     DebugPrintln(realtimeStatus.dischargeEquipmentStatus);
   }
   else

@@ -461,27 +461,24 @@ void info()
   int systemUpTimeHr = (millisecs / (60 * 60)) % 24;
   int systemUpTimeDy = (millisecs / (60 * 60 * 24));
 
-  // compose uptime string
-  String uptime = "<b>System Uptime:</b> " + String(systemUpTimeDy) + " day(s), " +
-                  systemUpTimeHr + " hour(s), " + systemUpTimeMn + " minute(s), " +
-                  systemUpTimeSc + " second(s)";
-
   // compose info string
   String info = htmlHeader(String(HOSTNAME) + " Info") + "<h1>" + String(HOSTNAME) + " Info </h1>" +
-                "<b>ESP8266 Core Version:</b> " + String(ESP.getCoreVersion()) + "</br>" +
-                "<b>ESP8266 SDK Version:</b> " + String(ESP.getSdkVersion()) + "</br></br>" +
-                "<b>Reset Reason:</b> " + String(ESP.getResetReason()) + "</br></br>" +
-                "<b>Free Heap:</b> " + String(ESP.getFreeHeap()) + "bytes (" +
-                ESP.getHeapFragmentation() + "% fragmentation)</br></br>"
-                                             "<b>ESP8266 Chip ID:</b> " +
-                String(ESP.getChipId()) + "</br>" +
-                "<b>ESP8266 Flash Chip ID:</b> " + String(ESP.getFlashChipId()) + "</br></br>" +
-                "<b>Flash Chip Size:</b> " + String(ESP.getFlashChipRealSize()) + " bytes (" +
+                "<b>ESP8266 Core Version:</b> " + ESP.getCoreVersion() + "</br>" +
+                "<b>ESP8266 SDK Version:</b> " + ESP.getSdkVersion() + "</br></br>" +
+                "<b>Reset Reason:</b> " + ESP.getResetReason() + "</br></br>" +
+                "<b>Free Heap:</b> " + ESP.getFreeHeap() + "bytes (" +
+                ESP.getHeapFragmentation() + "% fragmentation)</br></br>" +
+                "<b>ESP8266 Chip ID:</b> " + ESP.getChipId() + "</br>" +
+                "<b>ESP8266 Flash Chip ID:</b> " + ESP.getFlashChipId() + "</br></br>" +
+                "<b>Flash Chip Size:</b> " + ESP.getFlashChipRealSize() + " bytes (" +
                 ESP.getFlashChipSize() + " bytes seen by SDK) </br>" +
-                "<b>Sketch Size:</b> " + String(ESP.getSketchSize()) + " bytes used of " +
-                String(ESP.getFreeSketchSpace()) + " bytes available"
-                                                   "</br></br>" +
-                uptime + htmlFooter();
+                "<b>Sketch Size:</b> " + ESP.getSketchSize() + " bytes used of " +
+                ESP.getFreeSketchSpace() + " bytes available</br></br>" +
+                "<b>WiFi SSID:</b> " + WiFi.SSID() + "</br>" +
+                "<b>WiFi RSSI:</b> " + WiFi.RSSI() + "dBm</br></br>" +
+                "<b>System Uptime:</b> " + String(systemUpTimeDy) + " day(s), " +
+                systemUpTimeHr + " hour(s), " + systemUpTimeMn + " minute(s), " +
+                systemUpTimeSc + " second(s)" + htmlFooter();
 
   server.send(200, "text/html", info);
 }

@@ -13,8 +13,22 @@ You can see the JSON data responses if you naviate to any of the following URLs:
   /getCoils
 ```
 
-![screenshot of realtime_data page](realtime_data.png)
+## Screenshots
 
-![screenshot of rated_data page](rated_data.png)
+### Dashboard overview page
+![screenshot of dashboard](documentation/images/dashboard.png)
 
-![screenshot of statistical_data page](statistical_data.png)
+### Realtime Data page
+![screenshot of realtime_data page](documentation/images/realtime_data.png)
+
+### Rated Data page
+![screenshot of rated_data page](documentation/images/rated_data.png)
+
+### Statistical Data page
+![screenshot of statistical_data page](documentation/images/statistical_data.png)
+
+### Coil Data page
+![screenshot of coil_data page](documentation/images/coil_data.png)
+
+### Discrete Data page
+![screenshot of discrete_data page](documentation/images/discrete_data.png)

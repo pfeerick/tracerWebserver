@@ -13,6 +13,8 @@ You can see the JSON data responses if you naviate to any of the following URLs:
   /getCoils
 ```
 
+There is also a some system information present at `/info`.
+
 ## Screenshots
 
 ### Dashboard overview page
@@ -32,3 +34,6 @@ You can see the JSON data responses if you naviate to any of the following URLs:
 
 ### Discrete Data page
 ![screenshot of discrete_data page](documentation/images/discrete_data.png)
+
+### System Info page
+![screenshot of System Info page](documentation/images/info.png)

@@ -186,6 +186,7 @@ void getRealtimeStatus();
 void getStatisticalData();
 void getCoils();
 void getDiscrete();
+void info();
 
 // tracer requires no handshaking
 void preTransmission() {}
@@ -339,6 +340,7 @@ void setup()
   server.on("/getStatisticalData", getStatisticalData);
   server.on("/getCoils", getCoils);
   server.on("/getDiscrete", getDiscrete);
+  server.on("/info", info);
 
   server.begin(); // Actually start the server
   DebugPrintln("HTTP server started");
@@ -438,6 +440,50 @@ void getDiscrete()
   server.send(200, "application/json",
               "{\"overTemp\":" + String(discreteInput.overTemp) +
                   ", \"dayNight\":" + String(discreteInput.dayNight) + "}");
+}
+
+String htmlHeader(String title)
+{
+  return "<html><head><title>" + title + "</title></head><body>";
+}
+
+String htmlFooter()
+{
+  return "</body></html>";
+}
+
+void info()
+{
+  // calculate uptime
+  long millisecs = millis() / 1000;
+  int systemUpTimeSc = millisecs % 60;
+  int systemUpTimeMn = (millisecs / 60) % 60;
+  int systemUpTimeHr = (millisecs / (60 * 60)) % 24;
+  int systemUpTimeDy = (millisecs / (60 * 60 * 24));
+
+  // compose uptime string
+  String uptime = "<b>System Uptime:</b> " + String(systemUpTimeDy) + " day(s), " +
+                  systemUpTimeHr + " hour(s), " + systemUpTimeMn + " minute(s), " +
+                  systemUpTimeSc + " second(s)";
+
+  // compose info string
+  String info = htmlHeader(String(HOSTNAME) + " Info") + "<h1>" + String(HOSTNAME) + " Info </h1>" +
+                "<b>ESP8266 Core Version:</b> " + String(ESP.getCoreVersion()) + "</br>" +
+                "<b>ESP8266 SDK Version:</b> " + String(ESP.getSdkVersion()) + "</br></br>" +
+                "<b>Reset Reason:</b> " + String(ESP.getResetReason()) + "</br></br>" +
+                "<b>Free Heap:</b> " + String(ESP.getFreeHeap()) + "bytes (" +
+                ESP.getHeapFragmentation() + "% fragmentation)</br></br>"
+                                             "<b>ESP8266 Chip ID:</b> " +
+                String(ESP.getChipId()) + "</br>" +
+                "<b>ESP8266 Flash Chip ID:</b> " + String(ESP.getFlashChipId()) + "</br></br>" +
+                "<b>Flash Chip Size:</b> " + String(ESP.getFlashChipRealSize()) + " bytes (" +
+                ESP.getFlashChipSize() + " bytes seen by SDK) </br>" +
+                "<b>Sketch Size:</b> " + String(ESP.getSketchSize()) + " bytes used of " +
+                String(ESP.getFreeSketchSpace()) + " bytes available"
+                                                   "</br></br>" +
+                uptime + htmlFooter();
+
+  server.send(200, "text/html", info);
 }
 
 String getContentType(String filename)
@@ -541,7 +587,7 @@ void updateNextRegistryEntry()
   if (currentRegistryNumber >= ARRAY_SIZE(Registries))
   {
     currentRegistryNumber = 0;
-  }  
+  }
 }
 
 void AddressRegistry_2000()

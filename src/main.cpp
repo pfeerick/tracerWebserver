@@ -461,6 +461,10 @@ void info()
   int systemUpTimeHr = (millisecs / (60 * 60)) % 24;
   int systemUpTimeDy = (millisecs / (60 * 60 * 24));
 
+  // get SPIFFs info
+  FSInfo fs_info;
+  SPIFFS.info(fs_info);
+
   // compose info string
   String info = htmlHeader(String(HOSTNAME) + " Info") + "<h1>" + String(HOSTNAME) + " Info </h1>" +
                 "<b>ESP8266 Core Version:</b> " + ESP.getCoreVersion() + "</br>" +
@@ -473,7 +477,9 @@ void info()
                 "<b>Flash Chip Size:</b> " + ESP.getFlashChipRealSize() + " bytes (" +
                 ESP.getFlashChipSize() + " bytes seen by SDK) </br>" +
                 "<b>Sketch Size:</b> " + ESP.getSketchSize() + " bytes used of " +
-                ESP.getFreeSketchSpace() + " bytes available</br></br>" +
+                ESP.getFreeSketchSpace() + " bytes available</br>" +
+                "<b>SPIFFs Usage:</b> " + fs_info.usedBytes + " bytes of " + 
+                fs_info.totalBytes + " bytes available</br></br>" + 
                 "<b>WiFi SSID:</b> " + WiFi.SSID() + "</br>" +
                 "<b>WiFi RSSI:</b> " + WiFi.RSSI() + "dBm</br></br>" +
                 "<b>System Uptime:</b> " + String(systemUpTimeDy) + " day(s), " +

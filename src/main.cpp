@@ -509,10 +509,10 @@ bool handleFileRead(String path)
     path += "index.html";                    // If a folder is requested, send the index file
   String contentType = getContentType(path); // Get the MIME type
   if (SPIFFS.exists(path))
-  {                                                     // If the file exists
-    File file = SPIFFS.open(path, "r");                 // Open it
-    size_t sent = server.streamFile(file, contentType); // And send it to the client
-    file.close();                                       // Then close the file again
+  {                                       // If the file exists
+    File file = SPIFFS.open(path, "r");   // Open it
+    server.streamFile(file, contentType); // And send it to the client
+    file.close();                         // Then close the file again
     return true;
   }
   DebugPrintln("\tFile Not Found");

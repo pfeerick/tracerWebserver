@@ -252,6 +252,8 @@ void setup()
   node.preTransmission(preTransmission);
   node.postTransmission(postTransmission);
 
+  WiFi.hostname(HOSTNAME);
+
   WiFiManager wifiManager;
   // wifiManager.resetSettings();
   wifiManager.autoConnect("AutoConnectAP");
@@ -478,8 +480,8 @@ void info()
                 ESP.getFlashChipSize() + " bytes seen by SDK) </br>" +
                 "<b>Sketch Size:</b> " + ESP.getSketchSize() + " bytes used of " +
                 ESP.getFreeSketchSpace() + " bytes available</br>" +
-                "<b>SPIFFs Usage:</b> " + fs_info.usedBytes + " bytes of " + 
-                fs_info.totalBytes + " bytes available</br></br>" + 
+                "<b>SPIFFs Usage:</b> " + fs_info.usedBytes + " bytes of " +
+                fs_info.totalBytes + " bytes available</br></br>" +
                 "<b>WiFi SSID:</b> " + WiFi.SSID() + "</br>" +
                 "<b>WiFi RSSI:</b> " + WiFi.RSSI() + "dBm</br></br>" +
                 "<b>System Uptime:</b> " + String(systemUpTimeDy) + " day(s), " +

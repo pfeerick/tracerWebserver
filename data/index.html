@@ -28,7 +28,7 @@
                     document.getElementById("pvCurrent").innerHTML = data.pvCurrent.toFixed(2) + " A";
                     //   document.getElementById("pvPower").innerHTML = data.pvPower.toFixed(0) + " W";
                     document.getElementById("batteryVoltage").innerHTML = data.batteryVoltage.toFixed(2) + " V";
-                    document.getElementById("batteryChargingCurrent").innerHTML = data.batteryChargingCurrent.toFixed(2) + " A";
+                    document.getElementById("batteryCurrent").innerHTML = (data.batteryChargingCurrent - data.loadCurrent).toFixed(2) + " A";
                     //   document.getElementById("batteryChargingPower").innerHTML = data.batteryChargingPower.toFixed(0) + " W";
                     document.getElementById("batterySoC").innerHTML = "Batt (" + data.batterySoC.toFixed(0) + "%)";
                     document.getElementById("loadVoltage").innerHTML = data.loadVoltage.toFixed(2) + " V";
@@ -92,7 +92,7 @@
         </tr>
         <tr>
             <td id="pvCurrent"></td>
-            <td id="batteryChargingCurrent"></td>
+            <td id="batteryCurrent"></td>
             <td id="loadCurrent"></td>
         </tr>
     </table>

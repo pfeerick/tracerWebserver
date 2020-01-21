@@ -1,5 +1,7 @@
 ## ESP8266 Tracer Webserver
 
+[![Build Status](https://travis-ci.org/pfeerick/tracerWebserver.svg?branch=master)](https://travis-ci.org/pfeerick/tracerWebserver)
+
 A simple webserver to create a web dashboard for the Tracer series charge controllers.
 
 You can see the JSON data responses if you naviate to any of the following URLs:
